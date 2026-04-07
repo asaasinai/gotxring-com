@@ -69,9 +69,9 @@ export function ChampionsClient({ champions }: { champions: ChampionCard[] }) {
             </div>
 
             {activeChampion.loadout && (
-              <div className=”mt-6 rounded-xl border border-zinc-800 bg-black/60 p-5”>
-                <h4 className=”text-sm font-semibold uppercase tracking-[0.16em] text-zinc-400”>Loadout</h4>
-                <p className=”mt-3 text-zinc-100”>{activeChampion.loadout}</p>
+              <div className="mt-6 rounded-xl border border-zinc-800 bg-black/60 p-5">
+                <h4 className="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-400">Loadout</h4>
+                <p className="mt-3 text-zinc-100">{activeChampion.loadout}</p>
               </div>
             )}
 

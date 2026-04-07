@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import type { YoutubeVideo } from '@/lib/youtube';
 
@@ -14,11 +14,39 @@ function formatVideoDate(iso: string): string {
 
 export function YoutubeFeed({ videos }: { videos: YoutubeVideo[] }) {
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   if (!videos.length) return null;
 
+  function scroll(dir: 'left' | 'right') {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir === 'right' ? 304 : -304, behavior: 'smooth' });
+  }
+
   return (
-    <div className="flex gap-4 overflow-x-auto pb-3" style={{ scrollSnapType: 'x mandatory' }}>
+    <div className="relative">
+      {/* Left arrow */}
+      <button
+        type="button"
+        onClick={() => scroll('left')}
+        className="absolute -left-4 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-zinc-700 bg-black/80 text-white backdrop-blur transition hover:border-zinc-400 hover:bg-black md:-left-5"
+        aria-label="Scroll left"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+
+      {/* Right arrow */}
+      <button
+        type="button"
+        onClick={() => scroll('right')}
+        className="absolute -right-4 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-zinc-700 bg-black/80 text-white backdrop-blur transition hover:border-zinc-400 hover:bg-black md:-right-5"
+        aria-label="Scroll right"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
+      <div ref={scrollRef} className="flex gap-4 overflow-x-auto pb-3 px-1" style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none' }}>
       {videos.map((video) => (
         <div
           key={video.id}
@@ -79,6 +107,7 @@ export function YoutubeFeed({ videos }: { videos: YoutubeVideo[] }) {
           )}
         </div>
       ))}
+      </div>
     </div>
   );
 }
