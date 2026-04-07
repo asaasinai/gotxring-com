@@ -29,6 +29,7 @@ export function BuildGalleryManager({ buildId, images }: { buildId: string; imag
   }
 
   function handleDelete(imageId: string) {
+    if (!confirm('Remove this image from the gallery?')) return;
     const fd = new FormData();
     fd.append('id', imageId);
     startTransition(async () => {
@@ -57,18 +58,19 @@ export function BuildGalleryManager({ buildId, images }: { buildId: string; imag
       {images.length > 0 ? (
         <div className="flex flex-wrap gap-2">
           {images.map((img, i) => (
-            <div key={img.id} className="group relative">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={img.url} alt={`Gallery image ${i + 1}`} className="h-16 w-20 rounded border border-zinc-700 object-cover" />
-              <span className="absolute bottom-0 left-0 rounded-bl rounded-tr bg-black/60 px-1 text-[9px] text-zinc-400">{i + 1}</span>
+            <div key={img.id} className="flex flex-col items-center gap-1">
+              <div className="relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={img.url} alt={`Gallery image ${i + 1}`} className="h-16 w-20 rounded border border-zinc-700 object-cover" />
+                <span className="absolute bottom-0 left-0 rounded-bl rounded-tr bg-black/60 px-1 text-[9px] text-zinc-400">{i + 1}</span>
+              </div>
               <button
                 type="button"
                 onClick={() => handleDelete(img.id)}
                 disabled={isPending}
-                className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-900 text-[10px] text-white opacity-0 transition hover:bg-red-700 group-hover:opacity-100 disabled:cursor-wait"
-                title="Remove image"
+                className="text-[11px] text-red-500 hover:text-red-300 disabled:cursor-wait"
               >
-                ✕
+                Remove
               </button>
             </div>
           ))}

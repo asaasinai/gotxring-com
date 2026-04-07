@@ -177,12 +177,19 @@ function OrderCard({ order }: { order: Order }) {
         <p className="text-xs text-zinc-500">{order.selectedSystem} · {fmt(order.createdAt.toISOString())}</p>
       )}
 
-      <form action={deleteOrderAction}>
-        <input type="hidden" name="id" value={order.id} />
-        <button className="rounded-md border border-red-900 px-3 py-1.5 text-xs text-red-400 hover:bg-red-950/30">
-          Delete Order
-        </button>
-      </form>
+      {isDone && (
+        <form
+          action={deleteOrderAction}
+          onSubmit={(e) => {
+            if (!confirm(`Delete order for ${order.customerName}? This cannot be undone.`)) e.preventDefault();
+          }}
+        >
+          <input type="hidden" name="id" value={order.id} />
+          <button className="rounded-md border border-red-900 px-3 py-1.5 text-xs text-red-400 hover:bg-red-950/30">
+            Delete Order
+          </button>
+        </form>
+      )}
     </div>
   );
 }

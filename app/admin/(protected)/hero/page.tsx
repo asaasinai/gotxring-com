@@ -9,7 +9,8 @@ export default async function AdminHeroPage() {
 
   return (
     <div className="grid gap-6">
-      <h1 className="text-3xl font-bold">Hero</h1>
+      <h1 className="text-3xl font-bold">Homepage Banner</h1>
+      <p className="text-sm text-zinc-400">Edit the headline, text, and background image shown at the top of the homepage.</p>
       <form action={upsertHeroAction} className="section-shell grid max-w-3xl gap-4 rounded-lg p-5">
         <input type="hidden" name="id" defaultValue={hero?.id} />
         <div>

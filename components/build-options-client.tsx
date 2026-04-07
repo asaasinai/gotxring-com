@@ -99,7 +99,9 @@ function GroupSection({ group }: { group: GroupWithItems }) {
         {group.items.map((item) => (
           <div key={item.id} className="grid gap-1">
             <ItemForm groupId={group.id} item={item} />
-            <form action={deleteConfigItemAction}>
+            <form action={deleteConfigItemAction} onSubmit={(e) => {
+              if (!confirm(`Remove "${item.label}"? This cannot be undone.`)) e.preventDefault();
+            }}>
               <input type="hidden" name="id" value={item.id} />
               <button className="text-xs text-red-500 hover:text-red-300">Remove option</button>
             </form>
@@ -114,7 +116,9 @@ function GroupSection({ group }: { group: GroupWithItems }) {
       </div>
 
       {/* Delete group */}
-      <form action={deleteConfigGroupAction}>
+      <form action={deleteConfigGroupAction} onSubmit={(e) => {
+        if (!confirm(`Delete the "${group.name}" group and all its options? This cannot be undone.`)) e.preventDefault();
+      }}>
         <input type="hidden" name="id" value={group.id} />
         <button className="rounded-md border border-red-900 px-3 py-1.5 text-xs text-red-400 hover:bg-red-950/30">
           Delete Group

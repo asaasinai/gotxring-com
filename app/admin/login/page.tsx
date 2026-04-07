@@ -33,7 +33,7 @@ export default async function AdminLoginPage({
             <label className="label" htmlFor="username">
               Username
             </label>
-            <input id="username" name="username" defaultValue="garye" className="input" required />
+            <input id="username" name="username" className="input" required autoComplete="username" />
           </div>
           <div>
             <label className="label" htmlFor="password">

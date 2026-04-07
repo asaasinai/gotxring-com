@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { Prisma } from '@prisma/client';
 
 import { clearAdminSession, createAdminSession, requireAdminSession, verifyAdminLogin } from '@/lib/auth';
@@ -107,6 +108,7 @@ export async function upsertBuildAction(formData: FormData): Promise<void> {
   revalidatePath('/');
   revalidatePath('/builds');
   revalidatePath('/admin/builds');
+  redirect('/admin/builds?saved=1');
 }
 
 export async function addBuildImageAction(formData: FormData): Promise<void> {
@@ -142,6 +144,7 @@ export async function deleteBuildAction(formData: FormData): Promise<void> {
   revalidatePath('/');
   revalidatePath('/builds');
   revalidatePath('/admin/builds');
+  redirect('/admin/builds');
 }
 
 export async function upsertChampionAction(formData: FormData): Promise<void> {
@@ -176,6 +179,7 @@ export async function upsertChampionAction(formData: FormData): Promise<void> {
 
   revalidatePath('/');
   revalidatePath('/admin/champions');
+  redirect('/admin/champions?saved=1');
 }
 
 export async function deleteChampionAction(formData: FormData): Promise<void> {
@@ -187,6 +191,7 @@ export async function deleteChampionAction(formData: FormData): Promise<void> {
   await prisma.champion.delete({ where: { id } });
   revalidatePath('/');
   revalidatePath('/admin/champions');
+  redirect('/admin/champions');
 }
 
 export async function upsertBlogPostAction(formData: FormData): Promise<void> {
@@ -227,6 +232,7 @@ export async function upsertBlogPostAction(formData: FormData): Promise<void> {
   revalidatePath('/');
   revalidatePath('/blog');
   revalidatePath('/admin/blog-posts');
+  redirect('/admin/blog-posts?saved=1');
 }
 
 export async function deleteBlogPostAction(formData: FormData): Promise<void> {
@@ -239,6 +245,7 @@ export async function deleteBlogPostAction(formData: FormData): Promise<void> {
   revalidatePath('/');
   revalidatePath('/blog');
   revalidatePath('/admin/blog-posts');
+  redirect('/admin/blog-posts');
 }
 
 export async function upsertPressItemAction(formData: FormData): Promise<void> {
@@ -273,6 +280,7 @@ export async function upsertPressItemAction(formData: FormData): Promise<void> {
 
   revalidatePath('/');
   revalidatePath('/admin/press-items');
+  redirect('/admin/press-items?saved=1');
 }
 
 export async function deletePressItemAction(formData: FormData): Promise<void> {
@@ -284,6 +292,7 @@ export async function deletePressItemAction(formData: FormData): Promise<void> {
   await prisma.pressItem.delete({ where: { id } });
   revalidatePath('/');
   revalidatePath('/admin/press-items');
+  redirect('/admin/press-items');
 }
 
 // ── Config Option Groups ──────────────────────────────────────────────────────
@@ -470,6 +479,7 @@ export async function upsertContentAction(formData: FormData): Promise<void> {
   revalidatePath('/builds');
   revalidatePath('/contact');
   revalidatePath('/admin/content');
+  redirect('/admin/content?saved=1');
 }
 
 export async function updateSettingsAction(formData: FormData): Promise<void> {
@@ -491,7 +501,8 @@ export async function updateSettingsAction(formData: FormData): Promise<void> {
     await prisma.settings.create({ data: { notificationEmail: parsed.notificationEmail } });
   }
 
-  revalidatePath('/admin/settings');
+  revalidatePath('/admin/content');
+  redirect('/admin/content?saved=1');
 }
 
 export async function submitContactAction(formData: FormData): Promise<{ success?: string; error?: string }> {
@@ -536,4 +547,5 @@ export async function upsertHeroAction(formData: FormData): Promise<void> {
 
   revalidatePath('/');
   revalidatePath('/admin/hero');
+  redirect('/admin/hero?saved=1');
 }

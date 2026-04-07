@@ -1,17 +1,23 @@
-import { upsertContentAction } from '@/lib/actions';
+import { updateSettingsAction, upsertContentAction } from '@/lib/actions';
 import { CONTENT_KEYS, getManyContent } from '@/lib/content';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminContentPage() {
-  const content = await getManyContent(Object.keys(CONTENT_KEYS) as (keyof typeof CONTENT_KEYS)[]);
-
+  const [content, settings] = await Promise.all([
+    getManyContent(Object.keys(CONTENT_KEYS) as (keyof typeof CONTENT_KEYS)[]),
+    prisma.settings.findFirst(),
+  ]);
 
   return (
-    <div className="grid gap-6">
-      <h1 className="text-3xl font-bold">Page Content</h1>
+    <div className="grid gap-8">
+      <div>
+        <h1 className="text-3xl font-bold">Site Text &amp; Settings</h1>
+        <p className="mt-1 text-sm text-zinc-400">Edit the text shown on various pages and manage site-wide settings.</p>
+      </div>
 
-      <form action={upsertContentAction} className="grid gap-8">
+      <form action={upsertContentAction} className="grid gap-6">
         {/* Builds Page */}
         <fieldset className="section-shell rounded-lg p-5">
           <legend className="px-1 text-xs uppercase tracking-[0.2em] text-zinc-400">Builds Page</legend>
@@ -73,8 +79,28 @@ export default async function AdminContentPage() {
           </div>
         </fieldset>
 
-        <button type="submit" className="btn-primary w-fit">Save Content</button>
+        <button type="submit" className="btn-primary w-fit">Save All Text</button>
       </form>
+
+      {/* Notification email — separate form */}
+      <div className="border-t border-zinc-800 pt-6">
+        <h2 className="mb-1 text-lg font-semibold">Notification Email</h2>
+        <p className="mb-4 text-sm text-zinc-400">New order submissions are sent to this address.</p>
+        <form action={updateSettingsAction} className="flex max-w-sm items-end gap-3">
+          <div className="flex-1">
+            <label className="label" htmlFor="notificationEmail">Email Address</label>
+            <input
+              id="notificationEmail"
+              className="input"
+              name="notificationEmail"
+              type="email"
+              required
+              defaultValue={settings?.notificationEmail ?? ''}
+            />
+          </div>
+          <button className="btn-primary shrink-0">Save</button>
+        </form>
+      </div>
     </div>
   );
 }

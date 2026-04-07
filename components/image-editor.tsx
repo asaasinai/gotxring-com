@@ -182,18 +182,37 @@ export function ImageEditor({ urlInputName, currentUrl, label = 'Image', onUploa
     }, 'image/jpeg', 0.92);
   }
 
-  function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Load image src for optional crop/edit later
     const reader = new FileReader();
     reader.onload = (ev) => {
       setImgSrc(ev.target?.result as string);
       setRotation(0);
       setCrop(null);
-      setOpen(true);
       setError(null);
     };
     reader.readAsDataURL(file);
+
+    // Auto-upload immediately — no modal
+    setUploading(true);
+    setError(null);
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const json = await res.json() as { url?: string; error?: string };
+      if (!res.ok || !json.url) throw new Error(json.error ?? 'Upload failed');
+      setUploadedUrl(json.url);
+      setPreview(json.url);
+      onUpload?.(json.url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
     e.target.value = '';
   }
 
@@ -214,11 +233,11 @@ export function ImageEditor({ urlInputName, currentUrl, label = 'Image', onUploa
       )}
 
       <div className="flex items-center gap-3">
-        <label className="cursor-pointer rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-zinc-200 hover:border-zinc-500">
-          {preview ? 'Replace Image' : 'Choose Image'}
-          <input type="file" accept="image/*" className="hidden" onChange={onFileChange} />
+        <label className={`cursor-pointer rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-zinc-200 hover:border-zinc-500 ${uploading ? 'opacity-50 cursor-wait' : ''}`}>
+          {uploading ? 'Uploading…' : preview ? 'Replace Image' : 'Choose Image'}
+          <input type="file" accept="image/*" className="hidden" onChange={onFileChange} disabled={uploading} />
         </label>
-        {preview && (
+        {preview && !uploading && imgSrc && (
           <button type="button" onClick={() => setOpen(true)} className="text-xs text-zinc-400 underline hover:text-white">
             Edit / Crop
           </button>
