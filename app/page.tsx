@@ -27,22 +27,6 @@ export default async function HomePage() {
 
   const heroContent = hero ?? defaultHero;
 
-  // Group builds into category → subcategory hierarchy
-  const categoryMap = new Map<string, Map<string, typeof builds>>();
-  for (const build of builds) {
-    const cat = build.category || 'Other';
-    const sub = build.subcategory || '';
-    if (!categoryMap.has(cat)) categoryMap.set(cat, new Map());
-    const subMap = categoryMap.get(cat)!;
-    if (!subMap.has(sub)) subMap.set(sub, []);
-    subMap.get(sub)!.push(build);
-  }
-
-  const grouped = Array.from(categoryMap.entries()).map(([category, subMap]) => ({
-    category,
-    subcategories: Array.from(subMap.entries()).map(([name, items]) => ({ name, builds: items }))
-  }));
-
   return (
     <div>
       {/* ── Hero ── */}
@@ -79,7 +63,7 @@ export default async function HomePage() {
             <h2 className="mt-1 text-2xl font-bold uppercase tracking-[0.12em]">Our Systems</h2>
           </div>
         </div>
-        <ProductCatalog grouped={grouped} />
+        <ProductCatalog builds={builds} />
       </section>
 
       {/* ── Champions Circle ── */}

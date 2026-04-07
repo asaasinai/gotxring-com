@@ -20,14 +20,6 @@ type Build = {
   images: BuildImage[];
 };
 
-type GroupedBuilds = {
-  category: string;
-  subcategories: {
-    name: string;
-    builds: Build[];
-  }[];
-}[];
-
 function specEntries(specs: unknown): [string, string][] {
   if (!specs || typeof specs !== 'object' || Array.isArray(specs)) return [];
   return Object.entries(specs as Record<string, unknown>)
@@ -41,7 +33,7 @@ function getImages(build: Build): string[] {
   return build.imageUrl ? [build.imageUrl] : [];
 }
 
-// ─── Modal image carousel (self-contained, no className prop) ─────────────────
+// ─── Modal image carousel ─────────────────────────────────────────────────────
 
 function ModalCarousel({ images }: { images: string[] }) {
   const [idx, setIdx] = useState(0);
@@ -60,7 +52,6 @@ function ModalCarousel({ images }: { images: string[] }) {
 
   return (
     <div className="flex flex-col">
-      {/* Main image — relative container with explicit height, image is absolute inset-0 inside */}
       <div
         className="relative min-h-56 bg-zinc-900 sm:min-h-72 lg:min-h-[400px]"
         onTouchStart={onTouchStart}
@@ -76,36 +67,21 @@ function ModalCarousel({ images }: { images: string[] }) {
             }}
           />
         )}
-
         {images.length > 1 && (
           <>
-            <button
-              type="button"
-              onClick={prev}
-              className="absolute left-2 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-lg text-white hover:bg-black/80"
-            >‹</button>
-            <button
-              type="button"
-              onClick={next}
-              className="absolute right-2 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-lg text-white hover:bg-black/80"
-            >›</button>
+            <button type="button" onClick={prev} className="absolute left-2 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-lg text-white hover:bg-black/80">‹</button>
+            <button type="button" onClick={next} className="absolute right-2 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-lg text-white hover:bg-black/80">›</button>
             <div className="absolute bottom-2 right-3 z-10 rounded bg-black/60 px-2 py-0.5 text-xs text-white">
               {idx + 1} / {images.length}
             </div>
           </>
         )}
       </div>
-
-      {/* Thumbnail strip */}
       {images.length > 1 && (
         <div className="flex gap-1.5 overflow-x-auto bg-zinc-950 p-2">
           {images.map((url, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setIdx(i)}
-              className={`shrink-0 overflow-hidden rounded border-2 transition ${i === idx ? 'border-[#C8102E]' : 'border-transparent opacity-50 hover:opacity-100'}`}
-            >
+            <button key={i} type="button" onClick={() => setIdx(i)}
+              className={`shrink-0 overflow-hidden rounded border-2 transition ${i === idx ? 'border-[#C8102E]' : 'border-transparent opacity-50 hover:opacity-100'}`}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={url} alt="" className="h-12 w-16 object-cover" />
             </button>
@@ -132,26 +108,18 @@ function BuildModal({ build, onClose }: { build: Build; onClose: () => void }) {
   }, [onClose]);
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end bg-black/85 sm:items-center sm:p-4"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 flex items-end bg-black/85 sm:items-center sm:p-4" onClick={onClose}>
       <div
         className="section-shell flex max-h-[95dvh] w-full flex-col overflow-hidden rounded-t-2xl sm:max-h-[92vh] sm:max-w-5xl sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Mobile drag handle */}
         <div className="flex shrink-0 justify-center py-2 sm:hidden">
           <div className="h-1 w-10 rounded-full bg-zinc-700" />
         </div>
-
         <div className="flex min-h-0 flex-1 flex-col overflow-auto lg:flex-row">
-          {/* Image panel */}
           <div className="shrink-0 lg:w-[55%]">
             <ModalCarousel images={images} />
           </div>
-
-          {/* Details panel */}
           <div className="flex flex-col gap-4 overflow-auto p-5 lg:flex-1">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -163,9 +131,7 @@ function BuildModal({ build, onClose }: { build: Build; onClose: () => void }) {
               </div>
               <button type="button" onClick={onClose} className="btn-muted shrink-0 text-xs">✕ Close</button>
             </div>
-
             <p className="text-sm leading-relaxed text-zinc-300">{build.description}</p>
-
             {specEntries(build.specifications).length > 0 && (
               <div className="rounded-xl border border-zinc-800 bg-black/50 p-4">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">Specifications</p>
@@ -179,7 +145,6 @@ function BuildModal({ build, onClose }: { build: Build; onClose: () => void }) {
                 </div>
               </div>
             )}
-
             <Link
               href={`/order?system=${encodeURIComponent(build.name)}&category=${encodeURIComponent(build.category)}`}
               className="btn-primary mt-auto text-center text-sm"
@@ -207,39 +172,25 @@ function BuildCard({ build, onClick }: { build: Build; onClick: () => void }) {
       onClick={onClick}
       className="group section-shell overflow-hidden rounded-xl text-left transition hover:border-zinc-500 hover:shadow-lg hover:shadow-black/40 active:scale-[0.99]"
     >
-      {/* Thumbnail — simple background-image, no carousel component */}
       <div className="relative aspect-[4/3] bg-zinc-900">
         {thumb && (
           <div
             className="absolute inset-0"
-            style={{
-              backgroundImage: `url(${thumb})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            }}
+            style={{ backgroundImage: `url(${thumb})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
           />
         )}
-        {/* gradient for text legibility */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: 'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75))' }}
-        />
-        {/* hover tint */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75))' }} />
         <div className="absolute inset-0 pointer-events-none bg-[#C8102E]/0 transition group-hover:bg-[#C8102E]/5" />
-        {/* photo count badge */}
         {images.length > 1 && (
           <span className="absolute right-2 top-2 z-10 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-zinc-300">
             {images.length} photos
           </span>
         )}
-        {/* name/caliber overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
           <h3 className="text-sm font-bold leading-tight text-white drop-shadow-sm">{build.name}</h3>
           <p className="mt-0.5 text-xs text-zinc-300">{build.caliber}</p>
         </div>
       </div>
-
-      {/* Specs preview */}
       {specs.length > 0 && (
         <div className="grid gap-1.5 p-3 text-xs">
           {specs.map(([k, v]) => (
@@ -257,39 +208,87 @@ function BuildCard({ build, onClick }: { build: Build; onClick: () => void }) {
 
 // ─── Product Catalog ──────────────────────────────────────────────────────────
 
-export function ProductCatalog({ grouped }: { grouped: GroupedBuilds }) {
+export function ProductCatalog({ builds }: { builds: Build[] }) {
   const [active, setActive] = useState<Build | null>(null);
+  const [filter, setFilter] = useState('All');
 
-  if (!grouped.length) return null;
+  // Derive unique disciplines from data, sorted alphabetically
+  const disciplines = ['All', ...Array.from(
+    new Set(builds.map((b) => b.discipline).filter(Boolean))
+  ).sort()];
+
+  // Filter then regroup
+  const filtered = filter === 'All' ? builds : builds.filter((b) => b.discipline === filter);
+
+  const categoryMap = new Map<string, Map<string, Build[]>>();
+  for (const build of filtered) {
+    const cat = build.category || 'Other';
+    const sub = build.subcategory || '';
+    if (!categoryMap.has(cat)) categoryMap.set(cat, new Map());
+    const subMap = categoryMap.get(cat)!;
+    if (!subMap.has(sub)) subMap.set(sub, []);
+    subMap.get(sub)!.push(build);
+  }
+
+  const grouped = Array.from(categoryMap.entries()).map(([category, subMap]) => ({
+    category,
+    subcategories: Array.from(subMap.entries()).map(([name, items]) => ({ name, builds: items }))
+  }));
 
   return (
-    <div className="grid gap-14">
-      {grouped.map(({ category, subcategories }) => (
-        <div key={category}>
-          <div className="mb-8 flex items-center gap-4">
-            <div className="h-8 w-1 shrink-0 rounded-full bg-[#C8102E]" />
-            <h2 className="text-xl font-bold uppercase tracking-[0.1em] sm:text-2xl">{category}</h2>
-          </div>
-
-          <div className="grid gap-10">
-            {subcategories.map(({ name: sub, builds }) => (
-              <div key={sub}>
-                {sub && (
-                  <div className="mb-5 flex items-center gap-3">
-                    <span className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">{sub}</span>
-                    <div className="h-px flex-1 bg-zinc-800" />
-                  </div>
-                )}
-                <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
-                  {builds.map((build) => (
-                    <BuildCard key={build.id} build={build} onClick={() => setActive(build)} />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+    <div className="grid gap-10">
+      {/* Discipline filter bar */}
+      {disciplines.length > 1 && (
+        <div className="flex flex-wrap gap-2">
+          {disciplines.map((d) => (
+            <button
+              key={d}
+              type="button"
+              onClick={() => setFilter(d)}
+              className={`rounded-full border px-4 py-1.5 text-xs uppercase tracking-[0.16em] transition ${
+                filter === d
+                  ? 'border-[#C8102E] bg-[#C8102E] text-white'
+                  : 'border-zinc-700 text-zinc-400 hover:border-zinc-400 hover:text-white'
+              }`}
+            >
+              {d}
+            </button>
+          ))}
         </div>
-      ))}
+      )}
+
+      {/* Grouped grid */}
+      {grouped.length === 0 ? (
+        <p className="text-sm text-zinc-500">No systems found for this discipline.</p>
+      ) : (
+        <div className="grid gap-14">
+          {grouped.map(({ category, subcategories }) => (
+            <div key={category}>
+              <div className="mb-8 flex items-center gap-4">
+                <div className="h-8 w-1 shrink-0 rounded-full bg-[#C8102E]" />
+                <h2 className="text-xl font-bold uppercase tracking-[0.1em] sm:text-2xl">{category}</h2>
+              </div>
+              <div className="grid gap-10">
+                {subcategories.map(({ name: sub, builds: subBuilds }) => (
+                  <div key={sub}>
+                    {sub && (
+                      <div className="mb-5 flex items-center gap-3">
+                        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">{sub}</span>
+                        <div className="h-px flex-1 bg-zinc-800" />
+                      </div>
+                    )}
+                    <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
+                      {subBuilds.map((build) => (
+                        <BuildCard key={build.id} build={build} onClick={() => setActive(build)} />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {active && <BuildModal build={active} onClose={() => setActive(null)} />}
     </div>
