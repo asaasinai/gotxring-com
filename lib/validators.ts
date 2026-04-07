@@ -54,17 +54,19 @@ export const rssFeedSchema = z.object({
 });
 
 export const orderSchema = z.object({
+  orderType: z.string().min(1),
+  selectedSystem: z.string().min(1),
+  subcategory: z.string().optional(),
   customerName: z.string().min(2),
   email: z.string().email(),
-  shippingAddress: z.string().min(8),
   phone: z.string().min(6),
-  chassisModelOrPartModel: z.string().optional(),
+  shippingAddress: z.string().min(8),
+  caliber: z.string().optional(),
   handedness: z.enum(['Right', 'Left']).optional().or(z.literal('')),
   finishColor: z.string().optional(),
+  discipline: z.string().optional(),
   options: z.string().optional(),
   specialInstructions: z.string().optional(),
-  discipline: z.string().optional(),
-  caliber: z.string().optional(),
   notes: z.string().optional()
 });
 

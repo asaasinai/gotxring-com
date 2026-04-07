@@ -326,60 +326,25 @@ export async function deleteRssFeedAction(formData: FormData): Promise<void> {
 export async function updateOrderAction(formData: FormData): Promise<void> {
   requireAdminSession();
   const id = asString(formData.get('id'));
-  if (!id) {
-    return;
-  }
+  if (!id) return;
+
+  const newStatus = asString(formData.get('status'));
+  const note = asString(formData.get('note'));
+
+  const existing = await prisma.order.findUnique({ where: { id } });
+  if (!existing) return;
+
+  const history = (Array.isArray(existing.statusHistory) ? existing.statusHistory : []) as Array<{ status: string; note: string; at: string }>;
+  history.push({ status: newStatus, note, at: new Date().toISOString() });
 
   await prisma.order.update({
     where: { id },
     data: {
-      status: asString(formData.get('status')) || 'Pending',
-      notes: asString(formData.get('notes')) || null
+      status: newStatus,
+      notes: note || existing.notes,
+      statusHistory: history
     }
   });
-
-  revalidatePath('/admin/orders');
-}
-
-export async function upsertOrderAdminAction(formData: FormData): Promise<void> {
-  requireAdminSession();
-  const id = asString(formData.get('id'));
-  const parsed = orderSchema.parse({
-    customerName: asString(formData.get('customerName')),
-    email: asString(formData.get('email')),
-    shippingAddress: asString(formData.get('shippingAddress')),
-    phone: asString(formData.get('phone')),
-    chassisModelOrPartModel: asString(formData.get('chassisModelOrPartModel')),
-    handedness: asString(formData.get('handedness')),
-    finishColor: asString(formData.get('finishColor')),
-    options: asString(formData.get('options')),
-    specialInstructions: asString(formData.get('specialInstructions')),
-    discipline: asString(formData.get('discipline')),
-    caliber: asString(formData.get('caliber')),
-    notes: asString(formData.get('notes'))
-  });
-
-  const data = {
-    customerName: parsed.customerName,
-    email: parsed.email,
-    shippingAddress: parsed.shippingAddress,
-    phone: parsed.phone,
-    chassisModelOrPartModel: parsed.chassisModelOrPartModel || null,
-    handedness: parsed.handedness || null,
-    finishColor: parsed.finishColor || null,
-    options: parsed.options || null,
-    specialInstructions: parsed.specialInstructions || null,
-    discipline: parsed.discipline || null,
-    caliber: parsed.caliber || null,
-    notes: parsed.notes || null,
-    status: asString(formData.get('status')) || 'Pending'
-  };
-
-  if (id) {
-    await prisma.order.update({ where: { id }, data });
-  } else {
-    await prisma.order.create({ data });
-  }
 
   revalidatePath('/admin/orders');
 }
@@ -387,27 +352,26 @@ export async function upsertOrderAdminAction(formData: FormData): Promise<void> 
 export async function deleteOrderAction(formData: FormData): Promise<void> {
   requireAdminSession();
   const id = asString(formData.get('id'));
-  if (!id) {
-    return;
-  }
+  if (!id) return;
   await prisma.order.delete({ where: { id } });
   revalidatePath('/admin/orders');
 }
 
 export async function upsertOrderAction(formData: FormData): Promise<{ success?: string; error?: string }> {
   const parsed = orderSchema.safeParse({
+    orderType: asString(formData.get('orderType')),
+    selectedSystem: asString(formData.get('selectedSystem')),
+    subcategory: asString(formData.get('subcategory')),
     customerName: asString(formData.get('customerName')),
     email: asString(formData.get('email')),
-    shippingAddress: asString(formData.get('shippingAddress')),
     phone: asString(formData.get('phone')),
-    chassisModelOrPartModel: asString(formData.get('chassisModelOrPartModel')),
+    shippingAddress: asString(formData.get('shippingAddress')),
+    caliber: asString(formData.get('caliber')),
     handedness: asString(formData.get('handedness')),
     finishColor: asString(formData.get('finishColor')),
+    discipline: asString(formData.get('discipline')),
     options: asString(formData.get('options')),
     specialInstructions: asString(formData.get('specialInstructions')),
-    discipline: asString(formData.get('discipline')),
-    caliber: asString(formData.get('caliber')),
-    notes: asString(formData.get('notes'))
   });
 
   if (!parsed.success) {
@@ -416,28 +380,28 @@ export async function upsertOrderAction(formData: FormData): Promise<{ success?:
 
   const order = await prisma.order.create({
     data: {
+      orderType: parsed.data.orderType,
+      selectedSystem: parsed.data.selectedSystem,
+      subcategory: parsed.data.subcategory || '',
       customerName: parsed.data.customerName,
       email: parsed.data.email,
-      shippingAddress: parsed.data.shippingAddress,
       phone: parsed.data.phone,
-      chassisModelOrPartModel: parsed.data.chassisModelOrPartModel || null,
+      shippingAddress: parsed.data.shippingAddress,
+      caliber: parsed.data.caliber || null,
       handedness: parsed.data.handedness || null,
       finishColor: parsed.data.finishColor || null,
+      discipline: parsed.data.discipline || null,
       options: parsed.data.options || null,
       specialInstructions: parsed.data.specialInstructions || null,
-      discipline: parsed.data.discipline || null,
-      caliber: parsed.data.caliber || null,
-      notes: parsed.data.notes || null,
-      status: 'Pending'
+      status: 'Quote Requested',
+      statusHistory: [{ status: 'Quote Requested', note: 'Order submitted via website', at: new Date().toISOString() }]
     }
   });
 
   await sendOrderEmails(order);
   revalidatePath('/admin/orders');
 
-  return {
-    success: "Your order has been received. We'll be in touch within 24 hours."
-  };
+  return { success: "Your order has been received. We'll be in touch within 24 hours with pricing and delivery timeline." };
 }
 
 export async function upsertContentAction(formData: FormData): Promise<void> {

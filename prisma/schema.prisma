@@ -85,21 +85,30 @@ model PressItem {
 }
 
 model Order {
-  id                      String   @id @default(cuid())
-  customerName            String
-  email                   String
-  shippingAddress         String
-  phone                   String
-  chassisModelOrPartModel String?
-  handedness              String?
-  finishColor             String?
-  options                 String?
-  specialInstructions     String?
-  discipline              String?
-  caliber                 String?
-  notes                   String?
-  status                  String   @default("Pending")
-  createdAt               DateTime @default(now())
+  id                  String   @id @default(cuid())
+  // System selection
+  orderType           String   @default("")
+  selectedSystem      String   @default("")
+  subcategory         String   @default("")
+  // Customer info
+  customerName        String
+  email               String
+  phone               String
+  shippingAddress     String
+  // Build details
+  caliber             String?
+  handedness          String?
+  finishColor         String?
+  discipline          String?
+  options             String?
+  specialInstructions String?
+  notes               String?
+  // Status / queue
+  status              String   @default("Quote Requested")
+  statusHistory       Json     @default("[]")
+  estimatedCompletion DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
 
 model RssFeed {

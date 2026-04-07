@@ -1,134 +1,205 @@
-import { Order } from '@prisma/client';
-
-import { deleteOrderAction, updateOrderAction, upsertOrderAdminAction } from '@/lib/actions';
+import { deleteOrderAction, updateOrderAction } from '@/lib/actions';
 import { prisma } from '@/lib/prisma';
 
-const statuses = ['Pending', 'In Review', 'Quoted', 'In Production', 'Shipped', 'Completed'];
 export const dynamic = 'force-dynamic';
 
-function OrderForm({ order }: { order?: Order }) {
+const STATUSES = [
+  'Quote Requested',
+  'Quote Sent',
+  'Deposit Received',
+  'In Queue',
+  'Parts Ordered',
+  'In Build',
+  'Quality Check',
+  'Ready to Ship',
+  'Shipped',
+  'Complete',
+  'Cancelled',
+];
+
+const STATUS_COLORS: Record<string, string> = {
+  'Quote Requested':  'border-zinc-600 bg-zinc-800 text-zinc-200',
+  'Quote Sent':       'border-blue-700 bg-blue-900/40 text-blue-200',
+  'Deposit Received': 'border-green-700 bg-green-900/40 text-green-200',
+  'In Queue':         'border-yellow-700 bg-yellow-900/30 text-yellow-200',
+  'Parts Ordered':    'border-orange-700 bg-orange-900/30 text-orange-200',
+  'In Build':         'border-[#C8102E] bg-[#C8102E]/20 text-red-200',
+  'Quality Check':    'border-purple-700 bg-purple-900/30 text-purple-200',
+  'Ready to Ship':    'border-teal-600 bg-teal-900/30 text-teal-200',
+  'Shipped':          'border-cyan-600 bg-cyan-900/30 text-cyan-200',
+  'Complete':         'border-green-500 bg-green-900/50 text-green-100',
+  'Cancelled':        'border-red-900 bg-red-950/30 text-red-400',
+};
+
+function StatusBadge({ status }: { status: string }) {
+  const cls = STATUS_COLORS[status] ?? 'border-zinc-700 bg-zinc-800 text-zinc-300';
   return (
-    <form action={upsertOrderAdminAction} className="section-shell grid gap-3 rounded-lg p-4">
-      <input type="hidden" name="id" defaultValue={order?.id} />
-      <div className="grid gap-3 md:grid-cols-2">
-        <div>
-          <label className="label">Customer Name</label>
-          <input className="input" name="customerName" required defaultValue={order?.customerName} />
-        </div>
-        <div>
-          <label className="label">Email</label>
-          <input className="input" name="email" required defaultValue={order?.email} />
-        </div>
-      </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        <div>
-          <label className="label">Phone</label>
-          <input className="input" name="phone" required defaultValue={order?.phone} />
-        </div>
-        <div>
-          <label className="label">Status</label>
-          <select className="input" name="status" defaultValue={order?.status || 'Pending'}>
-            {statuses.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-      <div>
-        <label className="label">Shipping Address</label>
-        <textarea className="input min-h-20" name="shippingAddress" required defaultValue={order?.shippingAddress} />
-      </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        <div>
-          <label className="label">Chassis/Part Model</label>
-          <input className="input" name="chassisModelOrPartModel" defaultValue={order?.chassisModelOrPartModel ?? ''} />
-        </div>
-        <div>
-          <label className="label">Handedness</label>
-          <select className="input" name="handedness" defaultValue={order?.handedness ?? ''}>
-            <option value="">Select</option>
-            <option value="Right">Right</option>
-            <option value="Left">Left</option>
-          </select>
-        </div>
-      </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        <div>
-          <label className="label">Finish/Color</label>
-          <input className="input" name="finishColor" defaultValue={order?.finishColor ?? ''} />
-        </div>
-        <div>
-          <label className="label">Discipline</label>
-          <input className="input" name="discipline" defaultValue={order?.discipline ?? ''} />
-        </div>
-      </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        <div>
-          <label className="label">Caliber</label>
-          <input className="input" name="caliber" defaultValue={order?.caliber ?? ''} />
-        </div>
-        <div>
-          <label className="label">Options</label>
-          <textarea className="input min-h-20" name="options" defaultValue={order?.options ?? ''} />
-        </div>
-      </div>
-      <div>
-        <label className="label">Special Instructions</label>
-        <textarea className="input min-h-20" name="specialInstructions" defaultValue={order?.specialInstructions ?? ''} />
-      </div>
-      <div>
-        <label className="label">Notes</label>
-        <textarea className="input min-h-20" name="notes" defaultValue={order?.notes ?? ''} />
-      </div>
-      <button className="btn-primary w-fit">{order ? 'Update Order' : 'Create Order'}</button>
-    </form>
+    <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider ${cls}`}>
+      {status}
+    </span>
+  );
+}
+
+type HistoryEntry = { status: string; note: string; at: string };
+
+function fmt(iso: string) {
+  return new Date(iso).toLocaleString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit'
+  });
+}
+
+function Field({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-[11px] uppercase tracking-wider text-zinc-500">{label}</p>
+      <p className="text-zinc-200">{value}</p>
+    </div>
   );
 }
 
 export default async function AdminOrdersPage() {
   const orders = await prisma.order.findMany({ orderBy: { createdAt: 'desc' } });
 
-  return (
-    <div className="grid gap-6">
-      <h1 className="text-3xl font-bold">Orders</h1>
-      <OrderForm />
+  const active = orders.filter((o) => o.status !== 'Complete' && o.status !== 'Cancelled');
+  const done = orders.filter((o) => o.status === 'Complete' || o.status === 'Cancelled');
 
-      <div className="grid gap-4">
-        {orders.map((order) => (
-          <div key={order.id} className="grid gap-3 rounded-lg border border-zinc-800 bg-black/30 p-4">
-            <div className="section-shell rounded-lg p-4">
-              <p className="text-xs uppercase tracking-[0.16em] text-zinc-400">Quick Status Update</p>
-              <form action={updateOrderAction} className="mt-3 grid gap-3 md:grid-cols-[1fr_1fr_auto] md:items-end">
+  return (
+    <div className="grid gap-8">
+      <div className="flex items-end justify-between">
+        <h1 className="text-3xl font-bold">Order Queue</h1>
+        <span className="text-sm text-zinc-400">{active.length} active · {done.length} closed</span>
+      </div>
+
+      {/* Pipeline overview */}
+      <div className="flex flex-wrap gap-2">
+        {STATUSES.filter((s) => s !== 'Cancelled').map((s) => {
+          const count = orders.filter((o) => o.status === s).length;
+          return (
+            <div key={s} className={`min-w-[90px] rounded-lg border px-3 py-2 text-center ${STATUS_COLORS[s] ?? ''}`}>
+              <p className="text-lg font-bold">{count}</p>
+              <p className="text-[10px] uppercase tracking-wider opacity-80">{s}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Active Orders */}
+      {active.length > 0 && (
+        <div className="grid gap-4">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-400">Active Orders</h2>
+          {active.map((order) => {
+            const history = (Array.isArray(order.statusHistory) ? order.statusHistory : []) as HistoryEntry[];
+            return (
+              <div key={order.id} className="grid gap-5 rounded-xl border border-zinc-800 bg-black/40 p-5">
+                {/* Header */}
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-lg font-bold">{order.customerName}</p>
+                    <p className="text-sm text-zinc-400">{order.email} · {order.phone}</p>
+                    <p className="mt-1 text-xs text-zinc-500">Submitted {fmt(order.createdAt.toISOString())}</p>
+                  </div>
+                  <StatusBadge status={order.status} />
+                </div>
+
+                {/* Order details */}
+                <div className="grid gap-2 rounded-lg border border-zinc-800 bg-zinc-900/50 p-4 text-sm">
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3">
+                    <Field label="Type" value={order.orderType} />
+                    <Field label="System" value={order.selectedSystem} />
+                    {order.subcategory && <Field label="Category" value={order.subcategory} />}
+                    {order.caliber && <Field label="Caliber" value={order.caliber} />}
+                    {order.handedness && <Field label="Handedness" value={order.handedness} />}
+                    {order.finishColor && <Field label="Finish" value={order.finishColor} />}
+                    {order.discipline && <Field label="Discipline" value={order.discipline} />}
+                  </div>
+                  {order.options && (
+                    <div className="mt-1 border-t border-zinc-800 pt-2">
+                      <p className="text-[11px] uppercase tracking-wider text-zinc-500">Options</p>
+                      <p className="mt-0.5 text-zinc-300">{order.options}</p>
+                    </div>
+                  )}
+                  {order.specialInstructions && (
+                    <div className="mt-1 border-t border-zinc-800 pt-2">
+                      <p className="text-[11px] uppercase tracking-wider text-zinc-500">Special Instructions</p>
+                      <p className="mt-0.5 text-zinc-300">{order.specialInstructions}</p>
+                    </div>
+                  )}
+                  <div className="mt-1 border-t border-zinc-800 pt-2">
+                    <p className="text-[11px] uppercase tracking-wider text-zinc-500">Ship To</p>
+                    <p className="mt-0.5 whitespace-pre-line text-zinc-300">{order.shippingAddress}</p>
+                  </div>
+                </div>
+
+                {/* Status update */}
+                <form action={updateOrderAction} className="grid gap-3 md:grid-cols-[1fr_2fr_auto] md:items-end">
+                  <input type="hidden" name="id" value={order.id} />
+                  <div>
+                    <label className="label">Update Status</label>
+                    <select className="input" name="status" defaultValue={order.status}>
+                      {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="label">Note (optional)</label>
+                    <input className="input" name="note" placeholder="e.g. Awaiting barrel blank" />
+                  </div>
+                  <button className="btn-primary">Update</button>
+                </form>
+
+                {/* History log */}
+                {history.length > 0 && (
+                  <div>
+                    <p className="mb-2 text-[11px] uppercase tracking-wider text-zinc-500">Status History</p>
+                    <div className="grid gap-2">
+                      {[...history].reverse().map((h, i) => (
+                        <div key={i} className="flex flex-wrap items-center gap-2 text-xs text-zinc-400">
+                          <span className="shrink-0 text-zinc-600">{fmt(h.at)}</span>
+                          <StatusBadge status={h.status} />
+                          {h.note && <span>{h.note}</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Delete */}
+                <form action={deleteOrderAction}>
+                  <input type="hidden" name="id" value={order.id} />
+                  <button className="rounded-md border border-red-900 px-3 py-1.5 text-xs text-red-400 hover:bg-red-950/30">
+                    Delete Order
+                  </button>
+                </form>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Closed Orders */}
+      {done.length > 0 && (
+        <div className="grid gap-4">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-600">Closed Orders</h2>
+          {done.map((order) => (
+            <div key={order.id} className="grid gap-3 rounded-xl border border-zinc-900 bg-black/20 p-5 opacity-70">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="font-semibold">{order.customerName}</p>
+                  <p className="text-xs text-zinc-500">{order.selectedSystem} · {fmt(order.createdAt.toISOString())}</p>
+                </div>
+                <StatusBadge status={order.status} />
+              </div>
+              <form action={deleteOrderAction}>
                 <input type="hidden" name="id" value={order.id} />
-                <div>
-                  <label className="label">Status</label>
-                  <select className="input" name="status" defaultValue={order.status}>
-                    {statuses.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="label">Notes</label>
-                  <input className="input" name="notes" defaultValue={order.notes ?? ''} />
-                </div>
-                <button className="btn-primary">Save</button>
+                <button className="rounded-md border border-red-900 px-3 py-1.5 text-xs text-red-400 hover:bg-red-950/30">Delete</button>
               </form>
             </div>
+          ))}
+        </div>
+      )}
 
-            <OrderForm order={order} />
-
-            <form action={deleteOrderAction}>
-              <input type="hidden" name="id" value={order.id} />
-              <button className="rounded-md border border-red-900 px-3 py-2 text-sm text-red-300">Delete</button>
-            </form>
-          </div>
-        ))}
-      </div>
+      {orders.length === 0 && (
+        <p className="text-sm text-zinc-500">No orders yet.</p>
+      )}
     </div>
   );
 }
