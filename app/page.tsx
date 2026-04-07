@@ -76,6 +76,48 @@ export default async function HomePage() {
         <ProductCatalog builds={builds} />
       </section>
 
+      {/* ── Order CTA ── */}
+      <section className="relative overflow-hidden border-b border-zinc-800">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_50%_50%,rgba(200,16,46,0.13),transparent)]" />
+        <div className="relative mx-auto w-full max-w-7xl px-4 py-20 md:px-8 text-center">
+          <p className="text-xs uppercase tracking-[0.3em] text-[#C8102E]">Ready to Build</p>
+          <h2 className="mt-2 text-3xl font-bold uppercase md:text-4xl">Configure Your Build</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-zinc-300">
+            Tell us your mission profile and we will design a precision system around your performance goals.
+          </p>
+          <Link href="/order" className="btn-primary mt-6 inline-block px-8 py-3 text-base">
+            Begin Order →
+          </Link>
+          <p className="mt-4 text-xs text-zinc-500">No payment required · Response within 24 hours</p>
+        </div>
+      </section>
+
+      {/* ── YouTube Videos ── */}
+      {videos.length > 0 && (
+        <section className="border-y border-zinc-800 bg-[#0d0d0d]">
+          <div className="mx-auto w-full max-w-7xl px-4 py-14 md:px-8">
+            <div className="mb-8 flex items-end justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-[#C8102E]">From the Shop Floor</p>
+                <h2 className="mt-1 text-2xl font-bold uppercase tracking-[0.12em]">Build Process Videos</h2>
+              </div>
+              <a
+                href="https://www.youtube.com/@garyeliseo1775"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 text-xs text-zinc-400 hover:text-white transition flex items-center gap-1.5"
+              >
+                <svg className="h-4 w-4 text-[#FF0000]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+                View all on YouTube →
+              </a>
+            </div>
+            <YoutubeFeed videos={videos} />
+          </div>
+        </section>
+      )}
+
       {/* ── Champions Circle ── */}
       <section className="border-y border-zinc-800 bg-[#111111]/70">
         <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-14 md:px-8">
@@ -127,48 +169,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* ── Order CTA ── */}
-      <section className="relative overflow-hidden border-b border-zinc-800">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_50%_50%,rgba(200,16,46,0.13),transparent)]" />
-        <div className="relative mx-auto w-full max-w-7xl px-4 py-20 md:px-8 text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#C8102E]">Ready to Build</p>
-          <h2 className="mt-2 text-3xl font-bold uppercase md:text-4xl">Configure Your Build</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-zinc-300">
-            Tell us your mission profile and we will design a precision system around your performance goals.
-          </p>
-          <Link href="/order" className="btn-primary mt-6 inline-block px-8 py-3 text-base">
-            Begin Order →
-          </Link>
-          <p className="mt-4 text-xs text-zinc-500">No payment required · Response within 24 hours</p>
-        </div>
-      </section>
-
-      {/* ── YouTube Videos ── */}
-      {videos.length > 0 && (
-        <section className="border-y border-zinc-800 bg-[#0d0d0d]">
-          <div className="mx-auto w-full max-w-7xl px-4 py-14 md:px-8">
-            <div className="mb-8 flex items-end justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-[#C8102E]">From the Shop Floor</p>
-                <h2 className="mt-1 text-2xl font-bold uppercase tracking-[0.12em]">Build Process Videos</h2>
-              </div>
-              <a
-                href="https://www.youtube.com/@garyeliseo1775"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shrink-0 text-xs text-zinc-400 hover:text-white transition flex items-center gap-1.5"
-              >
-                <svg className="h-4 w-4 text-[#FF0000]" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                </svg>
-                View all on YouTube →
-              </a>
-            </div>
-            <YoutubeFeed videos={videos} />
-          </div>
-        </section>
-      )}
 
       {/* ── Follow ── */}
       <section className="border-t border-zinc-800 bg-[#111111]/70">
