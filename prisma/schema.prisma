@@ -8,19 +8,30 @@ datasource db {
 }
 
 model Build {
-  id             String   @id @default(cuid())
+  id             String       @id @default(cuid())
   name           String
   description    String
-  category       String   @default("")
-  subcategory    String   @default("")
-  discipline     String   @default("")
-  chassisType    String   @default("")
+  category       String       @default("")
+  subcategory    String       @default("")
+  discipline     String       @default("")
+  chassisType    String       @default("")
   caliber        String
   imageUrl       String?
   specifications Json
-  featured       Boolean  @default(false)
-  sortOrder      Int      @default(0)
-  createdAt      DateTime @default(now())
+  featured       Boolean      @default(false)
+  sortOrder      Int          @default(0)
+  createdAt      DateTime     @default(now())
+  images         BuildImage[]
+}
+
+model BuildImage {
+  id        String   @id @default(cuid())
+  buildId   String
+  url       String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  build     Build    @relation(fields: [buildId], references: [id], onDelete: Cascade)
 }
 
 model Champion {

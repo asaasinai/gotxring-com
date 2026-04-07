@@ -110,6 +110,29 @@ export async function upsertBuildAction(formData: FormData): Promise<void> {
   revalidatePath('/admin/builds');
 }
 
+export async function addBuildImageAction(formData: FormData): Promise<void> {
+  requireAdminSession();
+  const buildId = asString(formData.get('buildId'));
+  const url = asString(formData.get('imageUrl'));
+  if (!buildId || !url) return;
+  const count = await prisma.buildImage.count({ where: { buildId } });
+  if (count >= 25) throw new Error('Maximum 25 images per build.');
+  await prisma.buildImage.create({ data: { buildId, url, sortOrder: count } });
+  revalidatePath('/');
+  revalidatePath('/builds');
+  revalidatePath('/admin/builds');
+}
+
+export async function deleteBuildImageAction(formData: FormData): Promise<void> {
+  requireAdminSession();
+  const id = asString(formData.get('id'));
+  if (!id) return;
+  await prisma.buildImage.delete({ where: { id } });
+  revalidatePath('/');
+  revalidatePath('/builds');
+  revalidatePath('/admin/builds');
+}
+
 export async function deleteBuildAction(formData: FormData): Promise<void> {
   requireAdminSession();
   const id = asString(formData.get('id'));

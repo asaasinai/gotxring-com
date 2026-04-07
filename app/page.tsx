@@ -18,7 +18,7 @@ const defaultHero = {
 
 export default async function HomePage() {
   const [builds, champions, posts, press, hero] = await Promise.all([
-    prisma.build.findMany({ orderBy: [{ category: 'asc' }, { subcategory: 'asc' }, { sortOrder: 'asc' }, { createdAt: 'asc' }] }),
+    prisma.build.findMany({ orderBy: [{ category: 'asc' }, { subcategory: 'asc' }, { sortOrder: 'asc' }, { createdAt: 'asc' }], include: { images: { orderBy: { sortOrder: 'asc' } } } }),
     prisma.champion.findMany({ where: { featured: true }, orderBy: { createdAt: 'desc' }, take: 4 }),
     prisma.blogPost.findMany({ where: { published: true }, orderBy: { publishedAt: 'desc' }, take: 3 }),
     prisma.pressItem.findMany({ orderBy: { publishedAt: 'desc' }, take: 3 }),
