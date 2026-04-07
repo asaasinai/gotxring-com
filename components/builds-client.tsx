@@ -92,7 +92,7 @@ function ModalCarousel({ images }: { images: string[] }) {
               key={i}
               type="button"
               onClick={() => setIdx(i)}
-              className={`shrink-0 overflow-hidden rounded border-2 transition ${i === idx ? 'border-[#C8102E]' : 'border-transparent opacity-50 hover:opacity-100'}`}
+              className={`shrink-0 overflow-hidden rounded border-2 transition ${i === idx ? 'border-[#FF1A35]' : 'border-transparent opacity-50 hover:opacity-100'}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={url} alt="" className="h-12 w-16 object-cover" />
@@ -136,7 +136,7 @@ export function BuildsClient({ builds }: { builds: BuildCard[] }) {
             type="button"
             className={
               activeFilter === filter
-                ? 'rounded-full bg-[#C8102E] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em]'
+                ? 'rounded-full bg-[#FF1A35] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em]'
                 : 'rounded-full border border-zinc-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-300 hover:border-zinc-500'
             }
             onClick={() => setActiveFilter(filter)}
@@ -174,13 +174,13 @@ export function BuildsClient({ builds }: { builds: BuildCard[] }) {
               </div>
               <div className="p-4 sm:p-5">
                 {build.discipline && (
-                  <p className="inline-block rounded bg-[#C8102E] px-2 py-0.5 text-[10px] uppercase tracking-[0.16em]">
+                  <p className="inline-block rounded bg-[#FF1A35] px-2 py-0.5 text-[10px] uppercase tracking-[0.16em]">
                     {build.discipline}
                   </p>
                 )}
                 <p className="mt-2 text-xs text-zinc-300 sm:text-sm">{build.caliber}</p>
                 <h3 className="mt-1 text-base font-bold sm:text-xl">{build.name}</h3>
-                <p className="mt-1 text-[10px] uppercase tracking-widest text-[#C8102E] sm:mt-2">View Details →</p>
+                <p className="mt-1 text-[10px] uppercase tracking-widest text-[#FF1A35] sm:mt-2">View Details →</p>
               </div>
             </button>
           );
@@ -213,7 +213,7 @@ export function BuildsClient({ builds }: { builds: BuildCard[] }) {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     {activeBuild.discipline && (
-                      <p className="inline-block rounded bg-[#C8102E] px-2 py-0.5 text-[11px] uppercase tracking-[0.16em]">
+                      <p className="inline-block rounded bg-[#FF1A35] px-2 py-0.5 text-[11px] uppercase tracking-[0.16em]">
                         {activeBuild.discipline}
                       </p>
                     )}

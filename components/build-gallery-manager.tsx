@@ -43,7 +43,7 @@ export function BuildGalleryManager({ buildId, images }: { buildId: string; imag
       {/* Header */}
       <div className="flex items-center gap-3">
         <span className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">Gallery Images</span>
-        <span className={`text-xs font-mono ${images.length >= 25 ? 'text-[#C8102E]' : 'text-zinc-500'}`}>
+        <span className={`text-xs font-mono ${images.length >= 25 ? 'text-[#FF1A35]' : 'text-zinc-500'}`}>
           {images.length} / 25
         </span>
         {savedMsg && (

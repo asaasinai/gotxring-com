@@ -24,7 +24,7 @@ const STATUS_COLORS: Record<string, string> = {
   'Deposit Received': 'border-green-700 bg-green-900/40 text-green-200',
   'In Queue':         'border-yellow-700 bg-yellow-900/30 text-yellow-200',
   'Parts Ordered':    'border-orange-700 bg-orange-900/30 text-orange-200',
-  'In Build':         'border-[#C8102E] bg-[#C8102E]/20 text-red-200',
+  'In Build':         'border-[#FF1A35] bg-[#FF1A35]/20 text-red-200',
   'Quality Check':    'border-purple-700 bg-purple-900/30 text-purple-200',
   'Ready to Ship':    'border-teal-600 bg-teal-900/30 text-teal-200',
   'Shipped':          'border-cyan-600 bg-cyan-900/30 text-cyan-200',

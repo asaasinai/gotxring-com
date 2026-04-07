@@ -87,7 +87,7 @@ export function ImageEditor({ urlInputName, currentUrl, label = 'Image', onUploa
     ctx.fillStyle = 'rgba(0,0,0,0.45)';
     ctx.fillRect(0, 0, overlay.width, overlay.height);
     ctx.clearRect(crop.x, crop.y, crop.w, crop.h);
-    ctx.strokeStyle = '#C8102E';
+    ctx.strokeStyle = '#FF1A35';
     ctx.lineWidth = 2;
     ctx.strokeRect(crop.x, crop.y, crop.w, crop.h);
     // Rule-of-thirds guides

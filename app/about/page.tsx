@@ -22,7 +22,7 @@ export default async function AboutPage() {
       {/* Page header */}
       <section className="border-b border-zinc-800 py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-4 md:px-8">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#C8102E]">Competition Machine Inc</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-[#FF1A35]">Competition Machine Inc</p>
           <h1 className="mt-2 text-4xl font-bold uppercase md:text-5xl">About Us</h1>
         </div>
       </section>

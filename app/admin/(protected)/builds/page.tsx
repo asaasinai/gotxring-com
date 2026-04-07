@@ -91,7 +91,7 @@ export default async function AdminBuildsPage() {
       {/* Existing builds — collapsed by default */}
       {Object.entries(grouped).map(([cat, subs]) => (
         <div key={cat}>
-          <h2 className="mb-3 text-lg font-bold uppercase tracking-widest text-[#C8102E]">{cat}</h2>
+          <h2 className="mb-3 text-lg font-bold uppercase tracking-widest text-[#FF1A35]">{cat}</h2>
           {Object.entries(subs).map(([sub, items]) => (
             <div key={sub} className="mb-4">
               {sub !== '—' && <h3 className="mb-2 text-sm uppercase tracking-widest text-zinc-400">{sub}</h3>}

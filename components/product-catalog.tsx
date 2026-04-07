@@ -81,7 +81,7 @@ function ModalCarousel({ images }: { images: string[] }) {
         <div className="flex gap-1.5 overflow-x-auto bg-zinc-950 p-2">
           {images.map((url, i) => (
             <button key={i} type="button" onClick={() => setIdx(i)}
-              className={`shrink-0 overflow-hidden rounded border-2 transition ${i === idx ? 'border-[#C8102E]' : 'border-transparent opacity-50 hover:opacity-100'}`}>
+              className={`shrink-0 overflow-hidden rounded border-2 transition ${i === idx ? 'border-[#FF1A35]' : 'border-transparent opacity-50 hover:opacity-100'}`}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={url} alt="" className="h-12 w-16 object-cover" />
             </button>
@@ -123,7 +123,7 @@ function BuildModal({ build, onClose }: { build: Build; onClose: () => void }) {
           <div className="flex flex-col gap-4 overflow-auto p-5 lg:flex-1">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[#C8102E]">
+                <p className="text-xs uppercase tracking-[0.2em] text-[#FF1A35]">
                   {build.category}{build.subcategory ? ` · ${build.subcategory}` : ''}
                 </p>
                 <h2 className="mt-2 text-xl font-bold leading-tight sm:text-2xl">{build.name}</h2>
@@ -180,7 +180,7 @@ function BuildCard({ build, onClick }: { build: Build; onClick: () => void }) {
           />
         )}
         <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75))' }} />
-        <div className="absolute inset-0 pointer-events-none bg-[#C8102E]/0 transition group-hover:bg-[#C8102E]/5" />
+        <div className="absolute inset-0 pointer-events-none bg-[#FF1A35]/0 transition group-hover:bg-[#FF1A35]/5" />
         {images.length > 1 && (
           <span className="absolute right-2 top-2 z-10 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-zinc-300">
             {images.length} photos
@@ -199,7 +199,7 @@ function BuildCard({ build, onClick }: { build: Build; onClick: () => void }) {
               <span className="text-right text-zinc-300">{v}</span>
             </div>
           ))}
-          <p className="mt-1 text-[10px] uppercase tracking-widest text-[#C8102E]">View Details →</p>
+          <p className="mt-1 text-[10px] uppercase tracking-widest text-[#FF1A35]">View Details →</p>
         </div>
       )}
     </button>
@@ -247,7 +247,7 @@ export function ProductCatalog({ builds }: { builds: Build[] }) {
               onClick={() => setFilter(d)}
               className={`rounded-full border px-4 py-1.5 text-xs uppercase tracking-[0.16em] transition ${
                 filter === d
-                  ? 'border-[#C8102E] bg-[#C8102E] text-white'
+                  ? 'border-[#FF1A35] bg-[#FF1A35] text-white'
                   : 'border-zinc-700 text-zinc-400 hover:border-zinc-400 hover:text-white'
               }`}
             >
@@ -265,7 +265,7 @@ export function ProductCatalog({ builds }: { builds: Build[] }) {
           {grouped.map(({ category, subcategories }) => (
             <div key={category}>
               <div className="mb-8 flex items-center gap-4">
-                <div className="h-8 w-1 shrink-0 rounded-full bg-[#C8102E]" />
+                <div className="h-8 w-1 shrink-0 rounded-full bg-[#FF1A35]" />
                 <h2 className="text-xl font-bold uppercase tracking-[0.1em] sm:text-2xl">{category}</h2>
               </div>
               <div className="grid gap-10">

@@ -80,7 +80,7 @@ export default async function HomePage() {
       <section className="relative overflow-hidden border-b border-zinc-800">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_50%_50%,rgba(200,16,46,0.13),transparent)]" />
         <div className="relative mx-auto w-full max-w-7xl px-4 py-20 md:px-8 text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#C8102E]">Ready to Build</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-[#FF1A35]">Ready to Build</p>
           <h2 className="mt-2 text-3xl font-bold uppercase md:text-4xl">Configure Your Build</h2>
           <p className="mx-auto mt-4 max-w-2xl text-zinc-300">
             Tell us your mission profile and we will design a precision system around your performance goals.
@@ -98,7 +98,7 @@ export default async function HomePage() {
           <div className="mx-auto w-full max-w-7xl px-4 py-14 md:px-8">
             <div className="mb-8 flex items-end justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-[#C8102E]">From the Shop Floor</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-[#FF1A35]">From the Shop Floor</p>
                 <h2 className="mt-1 text-2xl font-bold uppercase tracking-[0.12em]">Build Process Videos</h2>
               </div>
               <a
@@ -137,7 +137,7 @@ export default async function HomePage() {
         <div className="grid gap-5 md:grid-cols-3">
           {posts.map((post) => (
             <article key={post.id} className="section-shell rounded-lg p-5">
-              <p className="text-xs uppercase tracking-[0.16em] text-[#C8102E]">{post.category}</p>
+              <p className="text-xs uppercase tracking-[0.16em] text-[#FF1A35]">{post.category}</p>
               <h3 className="mt-1 text-lg font-semibold">{post.title}</h3>
               <p className="mt-2 text-sm text-zinc-300">{post.excerpt}</p>
               <Link href={`/blog/${post.slug}`} className="mt-4 inline-block text-sm text-white underline underline-offset-4">
@@ -159,12 +159,12 @@ export default async function HomePage() {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={item.imageUrl} alt={item.title} className="w-full h-44 object-cover" />
                 )}
-                <div className={`flex flex-1 ${!item.imageUrl ? 'border-l-4 border-[#C8102E]' : 'border-t border-zinc-800'}`}>
+                <div className={`flex flex-1 ${!item.imageUrl ? 'border-l-4 border-[#FF1A35]' : 'border-t border-zinc-800'}`}>
                   <div className="p-5">
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-white">{item.publication}</p>
                     <h3 className="mt-2 text-base font-semibold text-zinc-200 leading-snug">{item.title}</h3>
                     <p className="mt-1 text-xs text-zinc-500">{formatDate(item.publishedAt)}</p>
-                    <a href={item.url} target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm text-[#C8102E] hover:text-red-400 underline underline-offset-4 transition">
+                    <a href={item.url} target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm text-[#FF1A35] hover:text-red-400 underline underline-offset-4 transition">
                       Read source ↗
                     </a>
                   </div>

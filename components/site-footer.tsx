@@ -2,7 +2,7 @@ export function SiteFooter({ leadTime = '8–10 weeks' }: { leadTime?: string })
   return (
     <footer className="border-t border-zinc-800">
       {/* Lead time banner */}
-      <div className="bg-[#C8102E] px-4 py-3 text-center text-sm font-semibold text-white">
+      <div className="bg-[#FF1A35] px-4 py-3 text-center text-sm font-semibold text-white">
         Lead Time: {leadTime} — No payment required until your build is confirmed.
       </div>
 
@@ -25,7 +25,7 @@ export function SiteFooter({ leadTime = '8–10 weeks' }: { leadTime?: string })
               </div>
               <div>
                 <p className="mb-1 text-[0.65rem] uppercase tracking-[0.18em] text-zinc-500">Phone</p>
-                <a href="tel:9286490742" className="text-base font-semibold text-white transition hover:text-[#C8102E] md:text-sm md:font-normal md:text-zinc-300">
+                <a href="tel:9286490742" className="text-base font-semibold text-white transition hover:text-[#FF1A35] md:text-sm md:font-normal md:text-zinc-300">
                   928-649-0742
                 </a>
               </div>

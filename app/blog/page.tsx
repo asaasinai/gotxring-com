@@ -23,7 +23,7 @@ export default async function BlogPage() {
       <div className="mt-8 grid gap-5 md:grid-cols-2">
         {posts.map((post) => (
           <article key={post.id} className="section-shell rounded-lg p-5">
-            <p className="text-xs uppercase tracking-[0.16em] text-[#C8102E]">{post.category}</p>
+            <p className="text-xs uppercase tracking-[0.16em] text-[#FF1A35]">{post.category}</p>
             <h2 className="mt-2 text-2xl font-semibold">{post.title}</h2>
             <p className="mt-2 text-sm text-zinc-400">{formatDate(post.publishedAt ?? post.createdAt)}</p>
             <p className="mt-4 text-zinc-300">{post.excerpt}</p>

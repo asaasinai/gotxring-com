@@ -58,7 +58,7 @@ export function ChampionsClient({ champions }: { champions: ChampionCard[] }) {
                   style={{ backgroundImage: `url(${activeChampion.imageUrl ?? ''})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
                 />
                 <div>
-                  <p className="text-sm uppercase tracking-[0.16em] text-[#C8102E]">Champions Circle</p>
+                  <p className="text-sm uppercase tracking-[0.16em] text-[#FF1A35]">Champions Circle</p>
                   <h3 className="mt-2 text-3xl font-bold">{activeChampion.name}</h3>
                   <p className="mt-1 text-zinc-300">{activeChampion.title}</p>
                 </div>

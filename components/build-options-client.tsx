@@ -80,7 +80,7 @@ function GroupSection({ group }: { group: GroupWithItems }) {
           <div className="flex flex-col justify-end pb-0.5">
             <label className="label">Active</label>
             <input type="hidden" name="active" value="false" />
-            <input type="checkbox" name="active" value="true" defaultChecked={group.active} className="mt-2 h-5 w-5 accent-[#C8102E]" />
+            <input type="checkbox" name="active" value="true" defaultChecked={group.active} className="mt-2 h-5 w-5 accent-[#FF1A35]" />
           </div>
           <div className="flex items-end">
             <button className="btn-primary text-sm whitespace-nowrap">Save Group</button>

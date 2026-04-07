@@ -31,7 +31,7 @@ export function SiteHeader() {
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 md:px-8">
         {/* Logo */}
         <Link href="/" className="text-sm font-bold tracking-[0.28em] text-white">
-          GOT<span className="text-[#C8102E]">XRING</span>
+          GOT<span className="text-[#FF1A35]">XRING</span>
         </Link>
 
         {/* Desktop nav */}

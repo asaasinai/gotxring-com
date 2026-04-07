@@ -66,7 +66,7 @@ export function YoutubeFeed({ videos }: { videos: YoutubeVideo[] }) {
                   loading="lazy"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm transition duration-200 group-hover:bg-[#C8102E]/90">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm transition duration-200 group-hover:bg-[#FF1A35]/90">
                     <svg className="ml-1 h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M8 5v14l11-7z" />
                     </svg>

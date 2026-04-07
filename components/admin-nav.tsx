@@ -32,8 +32,8 @@ export function AdminNav() {
               className={`rounded border px-3 py-2 text-sm transition ${
                 isRed
                   ? isActive
-                    ? 'border-[#C8102E] bg-[#C8102E]/20 text-white font-semibold'
-                    : 'border-[#C8102E]/60 bg-[#C8102E]/10 text-[#C8102E] hover:bg-[#C8102E]/20'
+                    ? 'border-[#FF1A35] bg-[#FF1A35]/20 text-white font-semibold'
+                    : 'border-[#FF1A35]/60 bg-[#FF1A35]/10 text-[#FF1A35] hover:bg-[#FF1A35]/20'
                   : isActive
                   ? 'border-zinc-600 bg-zinc-800 text-white font-semibold'
                   : 'border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white'

@@ -15,7 +15,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
 
   return (
     <article className="mx-auto w-full max-w-4xl px-4 py-12 md:px-8">
-      <p className="text-xs uppercase tracking-[0.16em] text-[#C8102E]">{post.category}</p>
+      <p className="text-xs uppercase tracking-[0.16em] text-[#FF1A35]">{post.category}</p>
       <h1 className="mt-2 text-4xl font-bold">{post.title}</h1>
       <p className="mt-2 text-sm text-zinc-400">By {post.author} · {formatDate(post.publishedAt ?? post.createdAt)}</p>
       <div className="section-shell mt-8 rounded-xl p-6 md:p-8">

@@ -56,8 +56,8 @@ function StepIndicator({ current }: { current: number }) {
           <div key={label} className="flex items-center shrink-0">
             <div className="flex flex-col items-center gap-1">
               <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-all ${
-                i < current ? 'bg-[#C8102E] text-white' :
-                i === current ? 'border-2 border-[#C8102E] text-[#C8102E]' :
+                i < current ? 'bg-[#FF1A35] text-white' :
+                i === current ? 'border-2 border-[#FF1A35] text-[#FF1A35]' :
                 'border border-zinc-700 text-zinc-600'
               }`}>
                 {i < current ? '✓' : i + 1}
@@ -67,7 +67,7 @@ function StepIndicator({ current }: { current: number }) {
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <div className={`mx-2 h-px w-8 sm:w-10 ${i < current ? 'bg-[#C8102E]' : 'bg-zinc-800'}`} />
+              <div className={`mx-2 h-px w-8 sm:w-10 ${i < current ? 'bg-[#FF1A35]' : 'bg-zinc-800'}`} />
             )}
           </div>
         ))}
@@ -80,7 +80,7 @@ function SelectCard({ label, desc, selected, onClick }: { label: string; desc?: 
   return (
     <button type="button" onClick={onClick}
       className={`rounded-xl border p-5 text-left transition ${
-        selected ? 'border-[#C8102E] bg-[#C8102E]/10 text-white' : 'border-zinc-800 bg-zinc-900/50 text-zinc-300 hover:border-zinc-600 hover:text-white'
+        selected ? 'border-[#FF1A35] bg-[#FF1A35]/10 text-white' : 'border-zinc-800 bg-zinc-900/50 text-zinc-300 hover:border-zinc-600 hover:text-white'
       }`}>
       <p className="font-semibold">{label}</p>
       {desc && <p className="mt-1 text-xs text-zinc-400">{desc}</p>}
@@ -212,8 +212,8 @@ export function OrderForm({
   if (state.success) {
     return (
       <div className="section-shell rounded-xl p-10 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#C8102E]/15 border border-[#C8102E]/30">
-          <span className="text-2xl text-[#C8102E]">✓</span>
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#FF1A35]/15 border border-[#FF1A35]/30">
+          <span className="text-2xl text-[#FF1A35]">✓</span>
         </div>
         <h2 className="text-xl font-bold">Order Submitted</h2>
         {state.orderId && (
@@ -233,7 +233,7 @@ export function OrderForm({
       <div className="mb-5 flex items-center justify-between gap-2 text-sm">
         <span className="text-zinc-500">Need help ordering?</span>
         <a href={`tel:${orderPhone.replace(/\D/g, '')}`}
-          className="font-semibold text-white transition hover:text-[#C8102E]">
+          className="font-semibold text-white transition hover:text-[#FF1A35]">
           Call {orderPhone}
         </a>
       </div>
@@ -329,7 +329,7 @@ export function OrderForm({
                     <label className="label mb-0">Color Name / Code</label>
                     {'href' in (activeFinish ?? {}) && activeFinish?.href && (
                       <a href={activeFinish.href} target="_blank" rel="noopener noreferrer"
-                        className="rounded border border-[#C8102E]/60 bg-[#C8102E]/10 px-2 py-0.5 text-[11px] font-medium text-[#C8102E] hover:bg-[#C8102E]/20 transition">
+                        className="rounded border border-[#FF1A35]/60 bg-[#FF1A35]/10 px-2 py-0.5 text-[11px] font-medium text-[#FF1A35] hover:bg-[#FF1A35]/20 transition">
                         Browse colors ↗
                       </a>
                     )}
@@ -412,7 +412,7 @@ export function OrderForm({
               <div className="pb-3">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] uppercase tracking-wider text-zinc-500">System</span>
-                  <button type="button" onClick={() => setStep(1)} className="text-[10px] uppercase tracking-wider text-zinc-500 hover:text-[#C8102E] transition">Edit</button>
+                  <button type="button" onClick={() => setStep(1)} className="text-[10px] uppercase tracking-wider text-zinc-500 hover:text-[#FF1A35] transition">Edit</button>
                 </div>
                 <div className="grid gap-0.5">
                   <Row label="Type" value={orderType} />
@@ -424,7 +424,7 @@ export function OrderForm({
               <div className="py-3">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] uppercase tracking-wider text-zinc-500">Build Details</span>
-                  <button type="button" onClick={() => setStep(2)} className="text-[10px] uppercase tracking-wider text-zinc-500 hover:text-[#C8102E] transition">Edit</button>
+                  <button type="button" onClick={() => setStep(2)} className="text-[10px] uppercase tracking-wider text-zinc-500 hover:text-[#FF1A35] transition">Edit</button>
                 </div>
                 <div className="grid gap-0.5">
                   {caliber && <Row label="Caliber" value={caliber} />}
@@ -442,7 +442,7 @@ export function OrderForm({
               <div className="pt-3">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] uppercase tracking-wider text-zinc-500">Contact</span>
-                  <button type="button" onClick={() => setStep(INFO_STEP)} className="text-[10px] uppercase tracking-wider text-zinc-500 hover:text-[#C8102E] transition">Edit</button>
+                  <button type="button" onClick={() => setStep(INFO_STEP)} className="text-[10px] uppercase tracking-wider text-zinc-500 hover:text-[#FF1A35] transition">Edit</button>
                 </div>
                 <div className="grid gap-0.5">
                   <Row label="Name" value={customerName} />
