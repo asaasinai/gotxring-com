@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { ChampionsClient } from '@/components/champions-client';
+import { GalleryGrid } from '@/components/gallery-grid';
 import { ProductCatalog } from '@/components/product-catalog';
 import { YoutubeFeed } from '@/components/youtube-feed';
 import { prisma } from '@/lib/prisma';
@@ -19,13 +20,14 @@ const defaultHero = {
 };
 
 export default async function HomePage() {
-  const [builds, champions, posts, press, hero, videos] = await Promise.all([
+  const [builds, champions, posts, press, hero, videos, gallery] = await Promise.all([
     prisma.build.findMany({ orderBy: [{ category: 'asc' }, { subcategory: 'asc' }, { sortOrder: 'asc' }, { createdAt: 'asc' }], include: { images: { orderBy: { sortOrder: 'asc' } } } }),
     prisma.champion.findMany({ where: { featured: true }, orderBy: { createdAt: 'desc' }, take: 4 }),
     prisma.blogPost.findMany({ where: { published: true }, orderBy: { publishedAt: 'desc' }, take: 3 }),
     prisma.pressItem.findMany({ orderBy: { publishedAt: 'desc' }, take: 3 }),
     prisma.hero.findFirst({ orderBy: { updatedAt: 'desc' } }),
     getYoutubeVideos(),
+    prisma.galleryImage.findMany({ orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }], take: 8 }),
   ]);
 
   const heroContent = hero ?? defaultHero;
@@ -125,6 +127,22 @@ export default async function HomePage() {
           <ChampionsClient champions={champions} />
         </div>
       </section>
+
+      {/* ── Gallery Preview ── */}
+      {gallery.length > 0 && (
+        <section className="mx-auto w-full max-w-7xl px-4 py-14 md:px-8">
+          <div className="mb-8 flex items-end justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-[#FF1A35]">From the Shop</p>
+              <h2 className="mt-1 text-2xl font-bold uppercase tracking-[0.12em]">Gallery</h2>
+            </div>
+            <Link href="/gallery" className="text-sm text-zinc-400 hover:text-white transition">
+              View all →
+            </Link>
+          </div>
+          <GalleryGrid images={gallery} />
+        </section>
+      )}
 
       {/* ── Blog Preview ── */}
       <section className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-14 md:px-8">

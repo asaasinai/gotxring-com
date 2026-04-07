@@ -7,6 +7,7 @@ import { adminLogoutAction } from '@/lib/actions';
 
 const tabs = [
   { href: '/admin/builds',      label: 'Builds / Products' },
+  { href: '/admin/gallery',     label: 'Gallery' },
   { href: '/admin/champions',   label: 'Champions' },
   { href: '/admin/blog-posts',  label: 'Blog Posts' },
   { href: '/admin/press-items', label: 'Press Items' },

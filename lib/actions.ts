@@ -562,3 +562,41 @@ export async function upsertHeroAction(formData: FormData): Promise<void> {
   revalidatePath('/admin/hero');
   redirect('/admin/hero?saved=1');
 }
+
+export async function saveGalleryImageAction(data: {
+  id?: string;
+  url: string;
+  caption: string;
+}): Promise<{ id: string; url: string; caption: string; sortOrder: number } | null> {
+  requireAdminSession();
+  try {
+    if (data.id) {
+      const updated = await prisma.galleryImage.update({
+        where: { id: data.id },
+        data: { caption: data.caption },
+      });
+      revalidatePath('/');
+      revalidatePath('/gallery');
+      return { id: updated.id, url: updated.url, caption: updated.caption, sortOrder: updated.sortOrder };
+    } else {
+      const created = await prisma.galleryImage.create({
+        data: { url: data.url, caption: data.caption },
+      });
+      revalidatePath('/');
+      revalidatePath('/gallery');
+      return { id: created.id, url: created.url, caption: created.caption, sortOrder: created.sortOrder };
+    }
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteGalleryImageAction(formData: FormData): Promise<void> {
+  requireAdminSession();
+  const id = typeof formData.get('id') === 'string' ? (formData.get('id') as string) : '';
+  if (!id) return;
+  await prisma.galleryImage.delete({ where: { id } });
+  revalidatePath('/');
+  revalidatePath('/gallery');
+  revalidatePath('/admin/gallery');
+}
