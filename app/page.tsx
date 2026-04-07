@@ -153,7 +153,7 @@ export default async function HomePage() {
               src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fprofile.php%3Fid%3D100057410442994&tabs=timeline&width=500&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false&color_scheme=dark"
               width="500"
               height="600"
-              style={{ border: 'none', overflow: 'hidden', maxWidth: '100%', display: 'block' }}
+              style={{ border: 'none', overflow: 'hidden', maxWidth: '100%', display: 'block', filter: 'invert(1) hue-rotate(180deg)' }}
               scrolling="no"
               frameBorder="0"
               allowFullScreen
