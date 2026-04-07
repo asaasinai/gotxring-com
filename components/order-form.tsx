@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { upsertOrderAction } from '@/lib/actions';
+import type { ConfigGroup } from '@/app/order/page';
 
 type FormState = { success?: string; error?: string };
 
@@ -29,13 +30,16 @@ const FINISH_OPTIONS = [
   { value: 'Other', label: 'Other / TBD' },
 ];
 
-const STEPS = ['Type', 'System', 'Build', 'Info', 'Review'];
+// Steps: for Full Rifle = Type, System, Build, Options, Info, Review (6)
+//        for Chassis    = Type, System, Build, Info, Review (5)
+const BASE_STEPS = ['Type', 'System', 'Build', 'Info', 'Review'];
+const RIFLE_STEPS = ['Type', 'System', 'Build', 'Options', 'Info', 'Review'];
 
-function StepIndicator({ current }: { current: number }) {
+function StepIndicator({ steps, current }: { steps: string[]; current: number }) {
   return (
-    <div className="flex items-center mb-8">
-      {STEPS.map((label, i) => (
-        <div key={label} className="flex items-center">
+    <div className="flex items-center mb-8 overflow-x-auto pb-1">
+      {steps.map((label, i) => (
+        <div key={label} className="flex items-center shrink-0">
           <div className="flex flex-col items-center gap-1">
             <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-all ${
               i < current ? 'bg-[#C8102E] text-white' :
@@ -48,8 +52,8 @@ function StepIndicator({ current }: { current: number }) {
               {label}
             </span>
           </div>
-          {i < STEPS.length - 1 && (
-            <div className={`mx-2 h-px w-8 sm:w-12 ${i < current ? 'bg-[#C8102E]' : 'bg-zinc-800'}`} />
+          {i < steps.length - 1 && (
+            <div className={`mx-2 h-px w-8 sm:w-10 ${i < current ? 'bg-[#C8102E]' : 'bg-zinc-800'}`} />
           )}
         </div>
       ))}
@@ -59,17 +63,35 @@ function StepIndicator({ current }: { current: number }) {
 
 function SelectCard({ label, desc, selected, onClick }: { label: string; desc?: string; selected: boolean; onClick: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
+    <button type="button" onClick={onClick}
       className={`rounded-xl border p-5 text-left transition ${
-        selected
-          ? 'border-[#C8102E] bg-[#C8102E]/10 text-white'
-          : 'border-zinc-800 bg-zinc-900/50 text-zinc-300 hover:border-zinc-600 hover:text-white'
-      }`}
-    >
+        selected ? 'border-[#C8102E] bg-[#C8102E]/10 text-white' : 'border-zinc-800 bg-zinc-900/50 text-zinc-300 hover:border-zinc-600 hover:text-white'
+      }`}>
       <p className="font-semibold">{label}</p>
       {desc && <p className="mt-1 text-xs text-zinc-400">{desc}</p>}
+    </button>
+  );
+}
+
+function ImageCard({ label, desc, imageUrl, selected, onClick }: { label: string; desc?: string; imageUrl?: string | null; selected: boolean; onClick: () => void }) {
+  return (
+    <button type="button" onClick={onClick}
+      className={`rounded-xl border text-left transition overflow-hidden ${
+        selected ? 'border-[#C8102E] ring-1 ring-[#C8102E]/50' : 'border-zinc-800 hover:border-zinc-600'
+      }`}>
+      <div className="aspect-[4/3] bg-zinc-900 relative">
+        {imageUrl
+          ? <div className="absolute inset-0" style={{ backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+          : <div className="absolute inset-0 flex items-center justify-center text-zinc-700 text-xs uppercase tracking-wider">No image yet</div>
+        }
+        {selected && (
+          <div className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#C8102E] text-white text-xs font-bold">✓</div>
+        )}
+      </div>
+      <div className={`p-3 ${selected ? 'bg-[#C8102E]/10' : 'bg-zinc-900/50'}`}>
+        <p className="font-semibold text-sm text-white">{label}</p>
+        {desc && <p className="mt-0.5 text-xs text-zinc-400">{desc}</p>}
+      </div>
     </button>
   );
 }
@@ -83,7 +105,7 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function OrderForm() {
+export function OrderForm({ configGroups }: { configGroups: ConfigGroup[] }) {
   const [step, setStep] = useState(0);
   const [state, setState] = useState<FormState>({});
   const [pending, setPending] = useState(false);
@@ -100,10 +122,21 @@ export function OrderForm() {
   const [options, setOptions] = useState('');
   const [specialInstructions, setSpecialInstructions] = useState('');
 
+  // Config selections: { [groupId]: itemLabel }
+  const [configSelections, setConfigSelections] = useState<Record<string, string>>({});
+
   const [customerName, setCustomerName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [shippingAddress, setShippingAddress] = useState('');
+
+  const isFullRifle = orderType === 'Full Rifle System';
+  const steps = isFullRifle ? RIFLE_STEPS : BASE_STEPS;
+
+  // Map logical step index accounting for Options step only on Full Rifle
+  // Steps: 0=Type, 1=System, 2=Build, [3=Options if rifle], info, review
+  const infoStep = isFullRifle ? 4 : 3;
+  const reviewStep = isFullRifle ? 5 : 4;
 
   const activeFinish = FINISH_OPTIONS.find((o) => o.value === finishType);
   const finishColor = finishType && colorName ? `${finishType} – ${colorName}` : finishType || colorName;
@@ -122,7 +155,8 @@ export function OrderForm() {
       return !!subcategory && !!selectedSystem;
     }
     if (step === 2) return true;
-    if (step === 3) return !!customerName && !!email && !!phone && !!shippingAddress;
+    if (step === 3 && isFullRifle) return true; // options optional
+    if (step === infoStep) return !!customerName && !!email && !!phone && !!shippingAddress;
     return true;
   }
 
@@ -138,6 +172,7 @@ export function OrderForm() {
     fd.append('discipline', discipline);
     fd.append('options', options);
     fd.append('specialInstructions', specialInstructions);
+    fd.append('configSelections', JSON.stringify(configSelections));
     fd.append('customerName', customerName);
     fd.append('email', email);
     fd.append('phone', phone);
@@ -159,30 +194,24 @@ export function OrderForm() {
 
   return (
     <div className="section-shell rounded-xl p-6 md:p-8">
-      <StepIndicator current={step} />
+      <StepIndicator steps={steps} current={step} />
 
       {/* Step 0 — Type */}
       {step === 0 && (
         <div className="grid gap-4">
           <h2 className="text-lg font-bold uppercase tracking-wide">What are you ordering?</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <SelectCard
-              label="Chassis System"
-              desc="Billet aluminum chassis only — you supply the action"
+            <SelectCard label="Chassis System" desc="Billet aluminum chassis only — you supply the action"
               selected={orderType === 'Chassis System'}
-              onClick={() => { setOrderType('Chassis System'); setSelectedSystem(''); setSubcategory(''); }}
-            />
-            <SelectCard
-              label="Full Rifle System"
-              desc="Complete custom precision rifle built to your specs"
+              onClick={() => { setOrderType('Chassis System'); setSelectedSystem(''); setSubcategory(''); }} />
+            <SelectCard label="Full Rifle System" desc="Complete custom precision rifle built to your specs"
               selected={orderType === 'Full Rifle System'}
-              onClick={() => { setOrderType('Full Rifle System'); setSelectedSystem(''); setSubcategory(''); }}
-            />
+              onClick={() => { setOrderType('Full Rifle System'); setSelectedSystem(''); setSubcategory(''); }} />
           </div>
         </div>
       )}
 
-      {/* Step 1 — System (Full Rifle: pick centerfire/rimfire first) */}
+      {/* Step 1 — System */}
       {step === 1 && orderType === 'Full Rifle System' && !subcategory && (
         <div className="grid gap-4">
           <h2 className="text-lg font-bold uppercase tracking-wide">Centerfire or Rimfire?</h2>
@@ -216,7 +245,6 @@ export function OrderForm() {
         <div className="grid gap-4">
           <h2 className="text-lg font-bold uppercase tracking-wide">Build Configuration</h2>
           <p className="text-xs uppercase tracking-wider text-zinc-500">All fields optional — we confirm details before build starts</p>
-
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="label">Caliber</label>
@@ -232,7 +260,6 @@ export function OrderForm() {
               </select>
             </div>
           </div>
-
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="label">Finish Type</label>
@@ -246,9 +273,7 @@ export function OrderForm() {
                   <label className="label">Color Name / Code</label>
                   {'href' in (activeFinish ?? {}) && activeFinish?.href && (
                     <a href={activeFinish.href} target="_blank" rel="noopener noreferrer"
-                      className="mb-1 rounded border border-[#C8102E]/60 bg-[#C8102E]/10 px-2 py-0.5 text-[10px] text-[#C8102E] hover:bg-[#C8102E]/20">
-                      Browse ↗
-                    </a>
+                      className="mb-1 rounded border border-[#C8102E]/60 bg-[#C8102E]/10 px-2 py-0.5 text-[10px] text-[#C8102E] hover:bg-[#C8102E]/20">Browse ↗</a>
                   )}
                 </div>
                 <input className="input" value={colorName} onChange={(e) => setColorName(e.target.value)}
@@ -256,19 +281,16 @@ export function OrderForm() {
               </div>
             )}
           </div>
-
           <div>
             <label className="label">Discipline / Intended Use</label>
             <input className="input" value={discipline} onChange={(e) => setDiscipline(e.target.value)}
               placeholder="e.g. F-Class, PRS, Benchrest, Hunting" />
           </div>
-
           <div>
             <label className="label">Options / Upgrades</label>
             <textarea className="input min-h-20" value={options} onChange={(e) => setOptions(e.target.value)}
               placeholder="Trigger preference, rail, brake, stock adjustments, etc." />
           </div>
-
           <div>
             <label className="label">Special Instructions</label>
             <textarea className="input min-h-20" value={specialInstructions} onChange={(e) => setSpecialInstructions(e.target.value)} />
@@ -276,8 +298,38 @@ export function OrderForm() {
         </div>
       )}
 
-      {/* Step 3 — Customer Info */}
-      {step === 3 && (
+      {/* Step 3 — Config Options (Full Rifle only) */}
+      {step === 3 && isFullRifle && (
+        <div className="grid gap-10">
+          <h2 className="text-lg font-bold uppercase tracking-wide">Configuration Options</h2>
+          {configGroups.map((group) => (
+            <div key={group.id} className="grid gap-4">
+              <div>
+                <h3 className="font-semibold text-white">{group.name}</h3>
+                {group.description && <p className="mt-0.5 text-sm text-zinc-400">{group.description}</p>}
+              </div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                {group.items.map((item) => (
+                  <ImageCard
+                    key={item.id}
+                    label={item.label}
+                    desc={item.description}
+                    imageUrl={item.imageUrl}
+                    selected={configSelections[group.id] === item.label}
+                    onClick={() => setConfigSelections((prev) => ({ ...prev, [group.id]: item.label }))}
+                  />
+                ))}
+              </div>
+              {!configSelections[group.id] && (
+                <p className="text-xs text-zinc-600 italic">Optional — skip if unsure, we will confirm before build starts</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Info step */}
+      {step === infoStep && (
         <div className="grid gap-4">
           <h2 className="text-lg font-bold uppercase tracking-wide">Your Information</h2>
           <div>
@@ -296,14 +348,13 @@ export function OrderForm() {
           </div>
           <div>
             <label className="label">Full Shipping Address *</label>
-            <textarea className="input min-h-24" required value={shippingAddress} onChange={(e) => setShippingAddress(e.target.value)}
-              placeholder="Street, City, State, ZIP" />
+            <textarea className="input min-h-24" required value={shippingAddress} onChange={(e) => setShippingAddress(e.target.value)} placeholder="Street, City, State, ZIP" />
           </div>
         </div>
       )}
 
-      {/* Step 4 — Review */}
-      {step === 4 && (
+      {/* Review step */}
+      {step === reviewStep && (
         <div className="grid gap-5">
           <h2 className="text-lg font-bold uppercase tracking-wide">Review & Submit</h2>
           <div className="rounded-xl border border-zinc-800 bg-black/40 p-5 grid gap-1 text-sm">
@@ -316,6 +367,10 @@ export function OrderForm() {
             {discipline && <Row label="Discipline" value={discipline} />}
             {options && <Row label="Options" value={options} />}
             {specialInstructions && <Row label="Special Instructions" value={specialInstructions} />}
+            {Object.entries(configSelections).map(([groupId, label]) => {
+              const group = configGroups.find((g) => g.id === groupId);
+              return group ? <Row key={groupId} label={group.name} value={label} /> : null;
+            })}
             <div className="my-2 border-t border-zinc-800" />
             <Row label="Name" value={customerName} />
             <Row label="Email" value={email} />
@@ -335,10 +390,10 @@ export function OrderForm() {
         {step > 0 && (
           <button type="button" onClick={() => setStep((s) => s - 1)} className="btn-muted text-sm">← Back</button>
         )}
-        {step < 4 && (
+        {step < reviewStep && (
           <button type="button" disabled={!canAdvance()} onClick={() => setStep((s) => s + 1)}
             className={`btn-primary text-sm ${!canAdvance() ? 'cursor-not-allowed opacity-40' : ''}`}>
-            {step === 3 ? 'Review Order →' : 'Continue →'}
+            {step === infoStep - 1 ? 'Your Info →' : step === infoStep ? 'Review Order →' : 'Continue →'}
           </button>
         )}
       </div>

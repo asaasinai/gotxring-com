@@ -84,6 +84,28 @@ model PressItem {
   createdAt   DateTime @default(now())
 }
 
+model ConfigOptionGroup {
+  id          String             @id @default(cuid())
+  name        String
+  description String             @default("")
+  sortOrder   Int                @default(0)
+  active      Boolean            @default(true)
+  items       ConfigOptionItem[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+model ConfigOptionItem {
+  id          String            @id @default(cuid())
+  groupId     String
+  label       String
+  description String            @default("")
+  imageUrl    String?
+  sortOrder   Int               @default(0)
+  group       ConfigOptionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdAt   DateTime          @default(now())
+}
+
 model Order {
   id                  String   @id @default(cuid())
   // System selection
@@ -103,6 +125,7 @@ model Order {
   options             String?
   specialInstructions String?
   notes               String?
+  configSelections    Json     @default("{}")
   // Status / queue
   status              String   @default("Quote Requested")
   statusHistory       Json     @default("[]")

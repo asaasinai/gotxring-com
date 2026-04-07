@@ -323,6 +323,67 @@ export async function deleteRssFeedAction(formData: FormData): Promise<void> {
   revalidatePath('/admin/rss-feeds');
 }
 
+// ── Config Option Groups ──────────────────────────────────────────────────────
+
+export async function upsertConfigGroupAction(formData: FormData): Promise<void> {
+  requireAdminSession();
+  const id = asString(formData.get('id'));
+  const data = {
+    name: asString(formData.get('name')),
+    description: asString(formData.get('description')),
+    sortOrder: parseInt(asString(formData.get('sortOrder')) || '0', 10),
+    active: asBoolean(formData.get('active')),
+  };
+  if (id) {
+    await prisma.configOptionGroup.update({ where: { id }, data });
+  } else {
+    await prisma.configOptionGroup.create({ data });
+  }
+  revalidatePath('/admin/build-options');
+  revalidatePath('/order');
+}
+
+export async function deleteConfigGroupAction(formData: FormData): Promise<void> {
+  requireAdminSession();
+  const id = asString(formData.get('id'));
+  if (!id) return;
+  await prisma.configOptionGroup.delete({ where: { id } });
+  revalidatePath('/admin/build-options');
+  revalidatePath('/order');
+}
+
+export async function upsertConfigItemAction(formData: FormData): Promise<void> {
+  requireAdminSession();
+  const id = asString(formData.get('id'));
+  const groupId = asString(formData.get('groupId'));
+  const imageUrl = asString(formData.get('imageUrl'));
+  const data = {
+    groupId,
+    label: asString(formData.get('label')),
+    description: asString(formData.get('description')),
+    imageUrl: imageUrl || (id ? undefined : null),
+    sortOrder: parseInt(asString(formData.get('sortOrder')) || '0', 10),
+  };
+  if (id) {
+    await prisma.configOptionItem.update({ where: { id }, data: { ...data, imageUrl: imageUrl || undefined } });
+  } else {
+    await prisma.configOptionItem.create({ data: { ...data, imageUrl: imageUrl || null } });
+  }
+  revalidatePath('/admin/build-options');
+  revalidatePath('/order');
+}
+
+export async function deleteConfigItemAction(formData: FormData): Promise<void> {
+  requireAdminSession();
+  const id = asString(formData.get('id'));
+  if (!id) return;
+  await prisma.configOptionItem.delete({ where: { id } });
+  revalidatePath('/admin/build-options');
+  revalidatePath('/order');
+}
+
+// ── Orders ────────────────────────────────────────────────────────────────────
+
 export async function updateOrderAction(formData: FormData): Promise<void> {
   requireAdminSession();
   const id = asString(formData.get('id'));
@@ -378,6 +439,12 @@ export async function upsertOrderAction(formData: FormData): Promise<{ success?:
     return { error: parsed.error.issues[0]?.message || 'Invalid form submission.' };
   }
 
+  let configSelections: Record<string, string> = {};
+  try {
+    const raw = asString(formData.get('configSelections'));
+    if (raw) configSelections = JSON.parse(raw) as Record<string, string>;
+  } catch { /* ignore */ }
+
   const order = await prisma.order.create({
     data: {
       orderType: parsed.data.orderType,
@@ -393,6 +460,7 @@ export async function upsertOrderAction(formData: FormData): Promise<{ success?:
       discipline: parsed.data.discipline || null,
       options: parsed.data.options || null,
       specialInstructions: parsed.data.specialInstructions || null,
+      configSelections,
       status: 'Quote Requested',
       statusHistory: [{ status: 'Quote Requested', note: 'Order submitted via website', at: new Date().toISOString() }]
     }

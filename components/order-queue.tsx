@@ -59,6 +59,7 @@ type Order = {
   options: string | null;
   specialInstructions: string | null;
   notes: string | null;
+  configSelections: unknown;
   status: string;
   statusHistory: unknown;
   createdAt: Date;
@@ -106,6 +107,22 @@ function OrderCard({ order }: { order: Order }) {
               {order.finishColor && <Field label="Finish" value={order.finishColor} />}
               {order.discipline && <Field label="Discipline" value={order.discipline} />}
             </div>
+            {(() => {
+              const sel = order.configSelections;
+              if (!sel || typeof sel !== 'object' || Array.isArray(sel)) return null;
+              const entries = Object.values(sel as Record<string, string>);
+              if (!entries.length) return null;
+              return (
+                <div className="mt-2 border-t border-zinc-800 pt-2">
+                  <p className="text-[11px] uppercase tracking-wider text-zinc-500 mb-1">Configuration Selections</p>
+                  <div className="grid gap-0.5">
+                    {entries.map((label) => (
+                      <p key={label} className="text-zinc-300 text-xs">· {label}</p>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
             {order.options && (
               <div className="mt-1 border-t border-zinc-800 pt-2">
                 <p className="text-[11px] uppercase tracking-wider text-zinc-500">Options</p>
