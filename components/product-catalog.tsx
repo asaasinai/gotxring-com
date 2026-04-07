@@ -41,127 +41,14 @@ function getImages(build: Build): string[] {
   return build.imageUrl ? [build.imageUrl] : [];
 }
 
-// ─── Image Carousel ──────────────────────────────────────────────────────────
+// ─── Modal image carousel (self-contained, no className prop) ─────────────────
 
-function ImageCarousel({ images, className }: { images: string[]; className?: string }) {
+function ModalCarousel({ images }: { images: string[] }) {
   const [idx, setIdx] = useState(0);
   const touchStartX = useRef<number | null>(null);
 
   const prev = () => setIdx((i) => (i - 1 + images.length) % images.length);
   const next = () => setIdx((i) => (i + 1) % images.length);
-
-  function onTouchStart(e: React.TouchEvent) {
-    touchStartX.current = e.touches[0].clientX;
-  }
-  function onTouchEnd(e: React.TouchEvent) {
-    if (touchStartX.current === null) return;
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) diff > 0 ? next() : prev();
-    touchStartX.current = null;
-  }
-
-  if (!images.length) {
-    return <div className={`bg-zinc-900 ${className ?? ''}`} />;
-  }
-
-  return (
-    <div className={`relative overflow-hidden ${className ?? ''}`} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-      {/* Main image */}
-      <div
-        className="h-full w-full"
-        style={{
-          backgroundImage: `url(${images[idx]})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      />
-
-      {/* Navigation — only when multiple images */}
-      {images.length > 1 && (
-        <>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); prev(); }}
-            className="absolute left-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 active:scale-95"
-            aria-label="Previous image"
-          >
-            ‹
-          </button>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); next(); }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 active:scale-95"
-            aria-label="Next image"
-          >
-            ›
-          </button>
-
-          {/* Dot indicators */}
-          <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1.5">
-            {images.slice(0, 10).map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={(e) => { e.stopPropagation(); setIdx(i); }}
-                className={`h-1.5 rounded-full transition-all ${i === idx ? 'w-4 bg-white' : 'w-1.5 bg-white/40'}`}
-                aria-label={`Image ${i + 1}`}
-              />
-            ))}
-            {images.length > 10 && (
-              <span className="text-[10px] text-white/60">{idx + 1}/{images.length}</span>
-            )}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
-// ─── Thumbnail Strip ──────────────────────────────────────────────────────────
-
-function ThumbnailStrip({ images, activeIdx, onSelect }: { images: string[]; activeIdx: number; onSelect: (i: number) => void }) {
-  if (images.length <= 1) return null;
-  return (
-    <div className="flex gap-1.5 overflow-x-auto bg-zinc-950 p-2 scrollbar-none">
-      {images.map((url, i) => (
-        <button
-          key={i}
-          type="button"
-          onClick={() => onSelect(i)}
-          className={`shrink-0 overflow-hidden rounded border-2 transition ${i === activeIdx ? 'border-[#C8102E]' : 'border-transparent opacity-60 hover:opacity-100'}`}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={url} alt="" className="h-12 w-16 object-cover" />
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// ─── Build Modal ──────────────────────────────────────────────────────────────
-
-function BuildModal({ build, onClose }: { build: Build; onClose: () => void }) {
-  const [imgIdx, setImgIdx] = useState(0);
-  const images = getImages(build);
-  const touchStartX = useRef<number | null>(null);
-
-  useEffect(() => {
-    const fn = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowLeft' && images.length > 1) setImgIdx((i) => (i - 1 + images.length) % images.length);
-      if (e.key === 'ArrowRight' && images.length > 1) setImgIdx((i) => (i + 1) % images.length);
-    };
-    window.addEventListener('keydown', fn);
-    // Prevent body scroll
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', fn);
-      document.body.style.overflow = '';
-    };
-  }, [onClose, images.length]);
-
-  const prev = () => setImgIdx((i) => (i - 1 + images.length) % images.length);
-  const next = () => setImgIdx((i) => (i + 1) % images.length);
 
   function onTouchStart(e: React.TouchEvent) { touchStartX.current = e.touches[0].clientX; }
   function onTouchEnd(e: React.TouchEvent) {
@@ -170,6 +57,79 @@ function BuildModal({ build, onClose }: { build: Build; onClose: () => void }) {
     if (Math.abs(diff) > 40) diff > 0 ? next() : prev();
     touchStartX.current = null;
   }
+
+  return (
+    <div className="flex flex-col">
+      {/* Main image — relative container with explicit height, image is absolute inset-0 inside */}
+      <div
+        className="relative min-h-56 bg-zinc-900 sm:min-h-72 lg:min-h-[400px]"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
+        {images[idx] && (
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url(${images[idx]})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          />
+        )}
+
+        {images.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={prev}
+              className="absolute left-2 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-lg text-white hover:bg-black/80"
+            >‹</button>
+            <button
+              type="button"
+              onClick={next}
+              className="absolute right-2 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-lg text-white hover:bg-black/80"
+            >›</button>
+            <div className="absolute bottom-2 right-3 z-10 rounded bg-black/60 px-2 py-0.5 text-xs text-white">
+              {idx + 1} / {images.length}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Thumbnail strip */}
+      {images.length > 1 && (
+        <div className="flex gap-1.5 overflow-x-auto bg-zinc-950 p-2">
+          {images.map((url, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setIdx(i)}
+              className={`shrink-0 overflow-hidden rounded border-2 transition ${i === idx ? 'border-[#C8102E]' : 'border-transparent opacity-50 hover:opacity-100'}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={url} alt="" className="h-12 w-16 object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Build Modal ──────────────────────────────────────────────────────────────
+
+function BuildModal({ build, onClose }: { build: Build; onClose: () => void }) {
+  const images = getImages(build);
+
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', fn);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', fn);
+      document.body.style.overflow = '';
+    };
+  }, [onClose]);
 
   return (
     <div
@@ -181,50 +141,17 @@ function BuildModal({ build, onClose }: { build: Build; onClose: () => void }) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Mobile drag handle */}
-        <div className="flex justify-center py-2 sm:hidden">
+        <div className="flex shrink-0 justify-center py-2 sm:hidden">
           <div className="h-1 w-10 rounded-full bg-zinc-700" />
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col overflow-auto lg:flex-row">
-          {/* ── Image Panel ── */}
-          <div className="flex shrink-0 flex-col lg:w-[58%]">
-            {/* Main image */}
-            <div
-              className="relative min-h-56 flex-1 bg-zinc-900 sm:min-h-72 lg:min-h-[380px]"
-              onTouchStart={onTouchStart}
-              onTouchEnd={onTouchEnd}
-              style={images[imgIdx] ? {
-                backgroundImage: `url(${images[imgIdx]})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              } : undefined}
-            >
-              {images.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={prev}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-lg text-white hover:bg-black/80"
-                    aria-label="Previous"
-                  >‹</button>
-                  <button
-                    type="button"
-                    onClick={next}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-lg text-white hover:bg-black/80"
-                    aria-label="Next"
-                  >›</button>
-                  <div className="absolute bottom-2 right-3 rounded bg-black/60 px-2 py-0.5 text-xs text-white">
-                    {imgIdx + 1} / {images.length}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Thumbnail strip */}
-            <ThumbnailStrip images={images} activeIdx={imgIdx} onSelect={setImgIdx} />
+          {/* Image panel */}
+          <div className="shrink-0 lg:w-[55%]">
+            <ModalCarousel images={images} />
           </div>
 
-          {/* ── Details Panel ── */}
+          {/* Details panel */}
           <div className="flex flex-col gap-4 overflow-auto p-5 lg:flex-1">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -271,6 +198,7 @@ function BuildModal({ build, onClose }: { build: Build; onClose: () => void }) {
 
 function BuildCard({ build, onClick }: { build: Build; onClick: () => void }) {
   const images = getImages(build);
+  const thumb = images[0] ?? null;
   const specs = specEntries(build.specifications).slice(0, 3);
 
   return (
@@ -279,31 +207,38 @@ function BuildCard({ build, onClick }: { build: Build; onClick: () => void }) {
       onClick={onClick}
       className="group section-shell overflow-hidden rounded-xl text-left transition hover:border-zinc-500 hover:shadow-lg hover:shadow-black/40 active:scale-[0.99]"
     >
-      {/* Image / carousel */}
+      {/* Thumbnail — simple background-image, no carousel component */}
       <div className="relative aspect-[4/3] bg-zinc-900">
-        {images.length > 0 ? (
-          <>
-            <ImageCarousel
-              images={images}
-              className="absolute inset-0"
-            />
-            {/* gradient overlay for text */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{ background: 'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75))' }}
-            />
-          </>
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-xs text-zinc-700">No image</span>
-          </div>
+        {thumb && (
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url(${thumb})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          />
         )}
-        <div className="absolute inset-0 bg-[#C8102E]/0 transition group-hover:bg-[#C8102E]/5 pointer-events-none" />
+        {/* gradient for text legibility */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75))' }}
+        />
+        {/* hover tint */}
+        <div className="absolute inset-0 pointer-events-none bg-[#C8102E]/0 transition group-hover:bg-[#C8102E]/5" />
+        {/* photo count badge */}
+        {images.length > 1 && (
+          <span className="absolute right-2 top-2 z-10 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-zinc-300">
+            {images.length} photos
+          </span>
+        )}
+        {/* name/caliber overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
           <h3 className="text-sm font-bold leading-tight text-white drop-shadow-sm">{build.name}</h3>
           <p className="mt-0.5 text-xs text-zinc-300">{build.caliber}</p>
         </div>
       </div>
+
       {/* Specs preview */}
       {specs.length > 0 && (
         <div className="grid gap-1.5 p-3 text-xs">
@@ -331,7 +266,6 @@ export function ProductCatalog({ grouped }: { grouped: GroupedBuilds }) {
     <div className="grid gap-14">
       {grouped.map(({ category, subcategories }) => (
         <div key={category}>
-          {/* Category header */}
           <div className="mb-8 flex items-center gap-4">
             <div className="h-8 w-1 shrink-0 rounded-full bg-[#C8102E]" />
             <h2 className="text-xl font-bold uppercase tracking-[0.1em] sm:text-2xl">{category}</h2>
