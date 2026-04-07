@@ -44,7 +44,6 @@ export function ChampionsClient({ champions }: { champions: ChampionCard[] }) {
                 <h3 className="mt-1 text-xl font-semibold">{champion.name}</h3>
               </div>
             </div>
-            <p className="text-zinc-200">“{champion.quote}”</p>
           </button>
         ))}
       </div>
@@ -69,16 +68,12 @@ export function ChampionsClient({ champions }: { champions: ChampionCard[] }) {
               </button>
             </div>
 
-            <div className="mt-6 grid gap-6 md:grid-cols-2">
-              <div className="rounded-xl border border-zinc-800 bg-black/60 p-5">
-                <h4 className="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-400">Quote</h4>
-                <p className="mt-3 text-lg text-zinc-100">“{activeChampion.quote}”</p>
+            {activeChampion.loadout && (
+              <div className=”mt-6 rounded-xl border border-zinc-800 bg-black/60 p-5”>
+                <h4 className=”text-sm font-semibold uppercase tracking-[0.16em] text-zinc-400”>Loadout</h4>
+                <p className=”mt-3 text-zinc-100”>{activeChampion.loadout}</p>
               </div>
-              <div className="rounded-xl border border-zinc-800 bg-black/60 p-5">
-                <h4 className="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-400">Loadout</h4>
-                <p className="mt-3 text-zinc-100">{activeChampion.loadout || 'Not provided'}</p>
-              </div>
-            </div>
+            )}
 
             <div className="mt-6 rounded-xl border border-zinc-800 bg-black/60 p-5">
               <h4 className="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-400">Achievements</h4>

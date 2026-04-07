@@ -22,10 +22,6 @@ function ChampionForm({ champion }: { champion?: Champion }) {
         </div>
       </div>
       <div>
-        <label className="label">Quote <span className="font-normal normal-case text-[10px] text-zinc-500">(optional)</span></label>
-        <input className="input" name="quote" defaultValue={champion?.quote} />
-      </div>
-      <div>
         <label className="label">Achievements <span className="font-normal normal-case text-[10px] text-zinc-500">(one per line)</span></label>
         <textarea className="input min-h-24" name="achievements" required defaultValue={champion?.achievements} placeholder="1st Place F-Open Nationals 2023&#10;World Record Holder 1000yd" />
       </div>
