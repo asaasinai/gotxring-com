@@ -154,15 +154,20 @@ export default async function HomePage() {
           <h2 className="text-2xl font-bold uppercase tracking-[0.12em]">Press</h2>
           <div className="grid gap-5 md:grid-cols-3">
             {press.map((item) => (
-              <article key={item.id} className="section-shell rounded-lg overflow-hidden flex">
-                <div className="w-1 shrink-0 bg-[#C8102E]" />
-                <div className="p-5">
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-white">{item.publication}</p>
-                  <h3 className="mt-2 text-base font-semibold text-zinc-200 leading-snug">{item.title}</h3>
-                  <p className="mt-1 text-xs text-zinc-500">{formatDate(item.publishedAt)}</p>
-                  <a href={item.url} target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm text-[#C8102E] hover:text-red-400 underline underline-offset-4 transition">
-                    Read source ↗
-                  </a>
+              <article key={item.id} className="section-shell rounded-lg overflow-hidden flex flex-col">
+                {item.imageUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={item.imageUrl} alt={item.title} className="w-full h-44 object-cover" />
+                )}
+                <div className={`flex flex-1 ${!item.imageUrl ? 'border-l-4 border-[#C8102E]' : 'border-t border-zinc-800'}`}>
+                  <div className="p-5">
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-white">{item.publication}</p>
+                    <h3 className="mt-2 text-base font-semibold text-zinc-200 leading-snug">{item.title}</h3>
+                    <p className="mt-1 text-xs text-zinc-500">{formatDate(item.publishedAt)}</p>
+                    <a href={item.url} target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm text-[#C8102E] hover:text-red-400 underline underline-offset-4 transition">
+                      Read source ↗
+                    </a>
+                  </div>
                 </div>
               </article>
             ))}
