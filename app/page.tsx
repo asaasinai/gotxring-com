@@ -148,6 +148,7 @@ export default async function HomePage() {
       <section className="border-t border-zinc-800 bg-[#111111]/70">
         <div className="mx-auto w-full max-w-7xl px-4 py-14 md:px-8">
           <h2 className="mb-8 text-2xl font-bold uppercase tracking-[0.12em]">Latest from Facebook</h2>
+          <div className="flex justify-center">
           <div className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50">
             <iframe
               src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fprofile.php%3Fid%3D100057410442994&tabs=timeline&width=500&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false&color_scheme=dark"
@@ -159,6 +160,7 @@ export default async function HomePage() {
               allowFullScreen
               allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
             />
+          </div>
           </div>
         </div>
       </section>
