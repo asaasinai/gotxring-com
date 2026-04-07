@@ -1,0 +1,62 @@
+import { upsertContentAction } from '@/lib/actions';
+import { CONTENT_KEYS, getManyContent } from '@/lib/content';
+
+export const dynamic = 'force-dynamic';
+
+export default async function AdminContentPage() {
+  const content = await getManyContent(Object.keys(CONTENT_KEYS) as (keyof typeof CONTENT_KEYS)[]);
+
+  return (
+    <div className="grid gap-6">
+      <h1 className="text-3xl font-bold">Page Content</h1>
+
+      <form action={upsertContentAction} className="grid gap-8">
+        {/* Builds Page */}
+        <fieldset className="section-shell rounded-lg p-5">
+          <legend className="px-1 text-xs uppercase tracking-[0.2em] text-zinc-400">Builds Page</legend>
+          <div className="mt-4 grid gap-4">
+            <label className="grid gap-1.5">
+              <span className="label">Page Title</span>
+              <input name="builds_title" className="input" defaultValue={content.builds_title} />
+            </label>
+            <label className="grid gap-1.5">
+              <span className="label">Subtext</span>
+              <textarea name="builds_subtext" rows={3} className="input resize-none" defaultValue={content.builds_subtext} />
+            </label>
+          </div>
+        </fieldset>
+
+        {/* Contact Page */}
+        <fieldset className="section-shell rounded-lg p-5">
+          <legend className="px-1 text-xs uppercase tracking-[0.2em] text-zinc-400">Contact Page</legend>
+          <div className="mt-4 grid gap-4">
+            <label className="grid gap-1.5">
+              <span className="label">Page Title</span>
+              <input name="contact_title" className="input" defaultValue={content.contact_title} />
+            </label>
+            <label className="grid gap-1.5">
+              <span className="label">Subtext</span>
+              <textarea name="contact_subtext" rows={3} className="input resize-none" defaultValue={content.contact_subtext} />
+            </label>
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="grid gap-1.5">
+                <span className="label">Phone</span>
+                <input name="contact_phone" className="input" defaultValue={content.contact_phone} placeholder="(555) 000-0000" />
+              </label>
+              <label className="grid gap-1.5">
+                <span className="label">Email</span>
+                <input name="contact_email" className="input" defaultValue={content.contact_email} placeholder="info@gotxring.com" />
+              </label>
+            </div>
+            <label className="grid gap-1.5">
+              <span className="label">Address</span>
+              <textarea name="contact_address" rows={3} className="input resize-none" defaultValue={content.contact_address} placeholder="123 Main St&#10;City, ST 00000" />
+            </label>
+          </div>
+        </fieldset>
+
+        <button type="submit" className="btn-primary w-fit">Save Content</button>
+      </form>
+    </div>
+  );
+}

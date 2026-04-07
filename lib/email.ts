@@ -63,6 +63,43 @@ function wrapTemplate(title: string, bodyHtml: string): string {
   </div>`;
 }
 
+type ContactEmailPayload = {
+  name: string;
+  email: string;
+  phone?: string;
+  subject?: string;
+  message: string;
+};
+
+export async function sendContactEmail(contact: ContactEmailPayload): Promise<void> {
+  if (!resend) {
+    console.warn('RESEND_API_KEY not set, skipping contact email.');
+    return;
+  }
+
+  const settings = await prisma.settings.findFirst();
+  const adminEmail = settings?.notificationEmail || 'spraynandprayn@gmail.com';
+
+  const html = wrapTemplate(
+    'New Contact Form Submission',
+    `<p style="color:#e5e7eb;margin-top:0;">A new message was submitted on GotXRing.com.</p>
+     <table style="width:100%;border-collapse:collapse;margin-top:12px;">
+       <tr><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#d1d5db;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;">Name</td><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#fff;">${contact.name}</td></tr>
+       <tr><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#d1d5db;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;">Email</td><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#fff;">${contact.email}</td></tr>
+       <tr><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#d1d5db;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;">Phone</td><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#fff;">${contact.phone || 'Not provided'}</td></tr>
+       <tr><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#d1d5db;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;">Subject</td><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#fff;">${contact.subject || 'Not provided'}</td></tr>
+       <tr><td style="padding:8px 12px;color:#d1d5db;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;vertical-align:top;">Message</td><td style="padding:8px 12px;color:#fff;white-space:pre-wrap;">${contact.message}</td></tr>
+     </table>`
+  );
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: adminEmail,
+    subject: `GotXRing Contact: ${contact.name}`,
+    html
+  });
+}
+
 export async function sendOrderEmails(order: OrderEmailPayload): Promise<void> {
   if (!resend) {
     console.warn('RESEND_API_KEY not set, skipping order emails.');

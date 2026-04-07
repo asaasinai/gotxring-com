@@ -10,6 +10,7 @@ const tabs = [
   { href: '/admin/press-items', label: 'Press Items' },
   { href: '/admin/orders', label: 'Orders' },
   { href: '/admin/rss-feeds', label: 'RSS Feeds' },
+  { href: '/admin/content', label: 'Page Content' },
   { href: '/admin/settings', label: 'Settings' }
 ];
 

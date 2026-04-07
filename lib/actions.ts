@@ -417,6 +417,22 @@ export async function upsertOrderAction(formData: FormData): Promise<{ success?:
   };
 }
 
+export async function upsertContentAction(formData: FormData): Promise<void> {
+  requireAdminSession();
+  const entries = Array.from(formData.entries()).filter(([k]) => k !== '__action');
+  for (const [key, value] of entries) {
+    if (typeof value !== 'string') continue;
+    await prisma.siteContent.upsert({
+      where: { key },
+      create: { key, value },
+      update: { value }
+    });
+  }
+  revalidatePath('/builds');
+  revalidatePath('/contact');
+  revalidatePath('/admin/content');
+}
+
 export async function updateSettingsAction(formData: FormData): Promise<void> {
   requireAdminSession();
   const parsed = settingsSchema.parse({
@@ -437,6 +453,20 @@ export async function updateSettingsAction(formData: FormData): Promise<void> {
   }
 
   revalidatePath('/admin/settings');
+}
+
+export async function submitContactAction(formData: FormData): Promise<{ success?: string; error?: string }> {
+  const name    = asString(formData.get('name'));
+  const email   = asString(formData.get('email'));
+  const phone   = asString(formData.get('phone'));
+  const subject = asString(formData.get('subject'));
+  const message = asString(formData.get('message'));
+
+  if (!name || !email || !message) return { error: 'Name, email, and message are required.' };
+
+  const { sendContactEmail } = await import('@/lib/email');
+  await sendContactEmail({ name, email, phone, subject, message });
+  return { success: "Message received. We'll be in touch within 24 hours." };
 }
 
 export async function upsertHeroAction(formData: FormData): Promise<void> {
