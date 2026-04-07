@@ -325,22 +325,29 @@ export async function deleteRssFeedAction(formData: FormData): Promise<void> {
 
 // ── Config Option Groups ──────────────────────────────────────────────────────
 
-export async function upsertConfigGroupAction(formData: FormData): Promise<void> {
-  requireAdminSession();
-  const id = asString(formData.get('id'));
-  const data = {
-    name: asString(formData.get('name')),
-    description: asString(formData.get('description')),
-    sortOrder: parseInt(asString(formData.get('sortOrder')) || '0', 10),
-    active: asBoolean(formData.get('active')),
-  };
-  if (id) {
-    await prisma.configOptionGroup.update({ where: { id }, data });
-  } else {
-    await prisma.configOptionGroup.create({ data });
+type ActionResult = { success?: string; error?: string };
+
+export async function upsertConfigGroupAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+  try {
+    requireAdminSession();
+    const id = asString(formData.get('id'));
+    const data = {
+      name: asString(formData.get('name')),
+      description: asString(formData.get('description')),
+      sortOrder: parseInt(asString(formData.get('sortOrder')) || '0', 10),
+      active: asBoolean(formData.get('active')),
+    };
+    if (id) {
+      await prisma.configOptionGroup.update({ where: { id }, data });
+    } else {
+      await prisma.configOptionGroup.create({ data });
+    }
+    revalidatePath('/admin/build-options');
+    revalidatePath('/order');
+    return { success: 'Group saved.' };
+  } catch (e) {
+    return { error: String(e) };
   }
-  revalidatePath('/admin/build-options');
-  revalidatePath('/order');
 }
 
 export async function deleteConfigGroupAction(formData: FormData): Promise<void> {
@@ -352,25 +359,36 @@ export async function deleteConfigGroupAction(formData: FormData): Promise<void>
   revalidatePath('/order');
 }
 
-export async function upsertConfigItemAction(formData: FormData): Promise<void> {
-  requireAdminSession();
-  const id = asString(formData.get('id'));
-  const groupId = asString(formData.get('groupId'));
-  const imageUrl = asString(formData.get('imageUrl'));
-  const data = {
-    groupId,
-    label: asString(formData.get('label')),
-    description: asString(formData.get('description')),
-    imageUrl: imageUrl || (id ? undefined : null),
-    sortOrder: parseInt(asString(formData.get('sortOrder')) || '0', 10),
-  };
-  if (id) {
-    await prisma.configOptionItem.update({ where: { id }, data: { ...data, imageUrl: imageUrl || undefined } });
-  } else {
-    await prisma.configOptionItem.create({ data: { ...data, imageUrl: imageUrl || null } });
+export async function upsertConfigItemAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+  try {
+    requireAdminSession();
+    const id = asString(formData.get('id'));
+    const groupId = asString(formData.get('groupId'));
+    const imageUrl = asString(formData.get('imageUrl'));
+    const label = asString(formData.get('label'));
+    if (!label) return { error: 'Label is required.' };
+    const payload = {
+      groupId,
+      label,
+      description: asString(formData.get('description')),
+      sortOrder: parseInt(asString(formData.get('sortOrder')) || '0', 10),
+    };
+    if (id) {
+      await prisma.configOptionItem.update({
+        where: { id },
+        data: { ...payload, ...(imageUrl ? { imageUrl } : {}) },
+      });
+    } else {
+      await prisma.configOptionItem.create({
+        data: { ...payload, imageUrl: imageUrl || null },
+      });
+    }
+    revalidatePath('/admin/build-options');
+    revalidatePath('/order');
+    return { success: id ? 'Option saved.' : 'Option added.' };
+  } catch (e) {
+    return { error: String(e) };
   }
-  revalidatePath('/admin/build-options');
-  revalidatePath('/order');
 }
 
 export async function deleteConfigItemAction(formData: FormData): Promise<void> {
