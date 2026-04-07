@@ -46,12 +46,6 @@ export const pressItemSchema = z.object({
   featured: z.boolean().optional()
 });
 
-export const rssFeedSchema = z.object({
-  name: z.string().min(2),
-  url: z.string().url(),
-  category: z.string().min(2),
-  active: z.boolean().optional()
-});
 
 export const orderSchema = z.object({
   orderType: z.string().min(1),

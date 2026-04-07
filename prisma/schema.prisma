@@ -134,30 +134,6 @@ model Order {
   updatedAt           DateTime @updatedAt
 }
 
-model RssFeed {
-  id            String    @id @default(cuid())
-  name          String
-  url           String
-  category      String
-  active        Boolean   @default(true)
-  lastFetchedAt DateTime?
-  createdAt     DateTime  @default(now())
-  items         RssItem[]
-}
-
-model RssItem {
-  id          String   @id @default(cuid())
-  feedId      String
-  title       String
-  url         String
-  excerpt     String?
-  imageUrl    String?
-  publishedAt DateTime?
-  createdAt   DateTime @default(now())
-
-  feed        RssFeed  @relation(fields: [feedId], references: [id], onDelete: Cascade)
-}
-
 model Settings {
   id                String   @id @default(cuid())
   notificationEmail String

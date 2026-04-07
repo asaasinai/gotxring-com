@@ -9,8 +9,7 @@ const tabs = [
   { href: '/admin/champions', label: 'Champions' },
   { href: '/admin/blog-posts', label: 'Blog Posts' },
   { href: '/admin/press-items', label: 'Press Items' },
-  { href: '/admin/rss-feeds', label: 'RSS Feeds' },
-  { href: '/admin/content', label: 'Page Content' },
+{ href: '/admin/content', label: 'Page Content' },
   { href: '/admin/settings', label: 'Settings' },
   { href: '/admin/orders', label: 'Orders', red: true },
 ];

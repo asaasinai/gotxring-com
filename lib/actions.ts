@@ -14,7 +14,6 @@ import {
   heroSchema,
   orderSchema,
   pressItemSchema,
-  rssFeedSchema,
   settingsSchema
 } from '@/lib/validators';
 
@@ -285,42 +284,6 @@ export async function deletePressItemAction(formData: FormData): Promise<void> {
   await prisma.pressItem.delete({ where: { id } });
   revalidatePath('/');
   revalidatePath('/admin/press-items');
-}
-
-export async function upsertRssFeedAction(formData: FormData): Promise<void> {
-  requireAdminSession();
-  const id = asString(formData.get('id'));
-  const parsed = rssFeedSchema.parse({
-    name: asString(formData.get('name')),
-    url: asString(formData.get('url')),
-    category: asString(formData.get('category')),
-    active: asBoolean(formData.get('active'))
-  });
-
-  const data = {
-    name: parsed.name,
-    url: parsed.url,
-    category: parsed.category,
-    active: parsed.active ?? false
-  };
-
-  if (id) {
-    await prisma.rssFeed.update({ where: { id }, data });
-  } else {
-    await prisma.rssFeed.create({ data });
-  }
-
-  revalidatePath('/admin/rss-feeds');
-}
-
-export async function deleteRssFeedAction(formData: FormData): Promise<void> {
-  requireAdminSession();
-  const id = asString(formData.get('id'));
-  if (!id) {
-    return;
-  }
-  await prisma.rssFeed.delete({ where: { id } });
-  revalidatePath('/admin/rss-feeds');
 }
 
 // ── Config Option Groups ──────────────────────────────────────────────────────

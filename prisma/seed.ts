@@ -268,55 +268,7 @@ const pressItems: Prisma.PressItemCreateInput[] = [
   }
 ];
 
-const rssFeeds: Prisma.RssFeedCreateInput[] = [
-  {
-    name: 'Precision Shooting News',
-    url: 'https://example.com/rss/precision-shooting.xml',
-    category: 'Industry',
-    active: true,
-    lastFetchedAt: new Date(),
-    items: {
-      create: [
-        {
-          title: 'Regional PRS events set new attendance records',
-          url: 'https://example.com/articles/prs-attendance',
-          excerpt: 'Growth in participation reflects surging interest in precision disciplines.',
-          imageUrl: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1200&q=80',
-          publishedAt: new Date('2025-11-01T00:00:00Z')
-        },
-        {
-          title: 'Barrel metallurgy advances improve thermal stability',
-          url: 'https://example.com/articles/barrel-metallurgy',
-          excerpt: 'Manufacturers publish new test data on thermal consistency.',
-          imageUrl: 'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80',
-          publishedAt: new Date('2025-10-26T00:00:00Z')
-        }
-      ]
-    }
-  },
-  {
-    name: 'Competitive Rifle Digest',
-    url: 'https://example.com/rss/competitive-rifle.xml',
-    category: 'Competition',
-    active: true,
-    lastFetchedAt: new Date(),
-    items: {
-      create: [
-        {
-          title: 'F-Class championship preview and equipment trends',
-          url: 'https://example.com/articles/fclass-preview',
-          excerpt: 'A look at top contenders and gear patterns this season.',
-          imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80',
-          publishedAt: new Date('2025-10-18T00:00:00Z')
-        }
-      ]
-    }
-  }
-];
-
 async function main() {
-  await prisma.rssItem.deleteMany();
-  await prisma.rssFeed.deleteMany();
   await prisma.order.deleteMany();
   await prisma.pressItem.deleteMany();
   await prisma.blogPost.deleteMany();
@@ -351,9 +303,6 @@ async function main() {
     await prisma.pressItem.create({ data: pressItem });
   }
 
-  for (const feed of rssFeeds) {
-    await prisma.rssFeed.create({ data: feed });
-  }
 }
 
 main()
