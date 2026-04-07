@@ -57,48 +57,57 @@ export function GalleryGrid({ images }: { images: GalleryItem[] }) {
       {/* Lightbox */}
       {active && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/92 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4"
           onClick={() => setActive(null)}
         >
-          <div className="relative max-h-[92vh] max-w-5xl w-full" onClick={(e) => e.stopPropagation()}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={active.url}
-              alt={active.caption || 'Gallery image'}
-              className="mx-auto max-h-[80vh] w-auto rounded-lg object-contain"
-            />
-            {active.caption && (
-              <p className="mt-3 text-center text-sm text-zinc-300">{active.caption}</p>
-            )}
+          {/* Close — top right corner, always visible */}
+          <button
+            type="button"
+            aria-label="Close"
+            className="absolute top-4 right-4 z-10 flex h-14 w-14 items-center justify-center rounded-full bg-white/10 border-2 border-white/40 text-white hover:bg-white/25 hover:border-white transition"
+            onClick={() => setActive(null)}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-8 w-8">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
 
-            {/* Prev / Next */}
+          <div className="relative flex w-full max-w-5xl items-center justify-center" onClick={(e) => e.stopPropagation()}>
+            {/* Prev */}
             {images.findIndex((i) => i.id === active.id) > 0 && (
               <button
                 type="button"
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 flex h-10 w-10 items-center justify-center rounded-full border border-zinc-700 bg-black/80 text-white hover:border-zinc-400 transition"
+                aria-label="Previous"
+                className="absolute left-0 -translate-x-16 flex h-14 w-14 items-center justify-center rounded-full bg-white/10 border-2 border-white/40 text-white hover:bg-white/25 hover:border-white transition"
                 onClick={(e) => { e.stopPropagation(); const idx = images.findIndex(i => i.id === active.id); setActive(images[idx - 1]); }}
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4"><path d="M15 18l-6-6 6-6"/></svg>
-              </button>
-            )}
-            {images.findIndex((i) => i.id === active.id) < images.length - 1 && (
-              <button
-                type="button"
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 flex h-10 w-10 items-center justify-center rounded-full border border-zinc-700 bg-black/80 text-white hover:border-zinc-400 transition"
-                onClick={(e) => { e.stopPropagation(); const idx = images.findIndex(i => i.id === active.id); setActive(images[idx + 1]); }}
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4"><path d="M9 18l6-6-6-6"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-7 w-7"><path d="M15 18l-6-6 6-6"/></svg>
               </button>
             )}
 
-            {/* Close */}
-            <button
-              type="button"
-              className="absolute -top-10 right-0 text-zinc-400 hover:text-white text-sm transition"
-              onClick={() => setActive(null)}
-            >
-              ✕ Close
-            </button>
+            <div className="max-h-[85vh] w-full">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={active.url}
+                alt={active.caption || 'Gallery image'}
+                className="mx-auto max-h-[85vh] w-auto rounded-lg object-contain"
+              />
+              {active.caption && (
+                <p className="mt-3 text-center text-base text-zinc-200">{active.caption}</p>
+              )}
+            </div>
+
+            {/* Next */}
+            {images.findIndex((i) => i.id === active.id) < images.length - 1 && (
+              <button
+                type="button"
+                aria-label="Next"
+                className="absolute right-0 translate-x-16 flex h-14 w-14 items-center justify-center rounded-full bg-white/10 border-2 border-white/40 text-white hover:bg-white/25 hover:border-white transition"
+                onClick={(e) => { e.stopPropagation(); const idx = images.findIndex(i => i.id === active.id); setActive(images[idx + 1]); }}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-7 w-7"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            )}
           </div>
         </div>
       )}
