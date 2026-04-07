@@ -19,24 +19,24 @@
   "dependencies": {
     "@prisma/client": "^6.19.3",
     "@vercel/blob": "latest",
+    "autoprefixer": "^10.4.27",
     "bcryptjs": "latest",
     "next": "14",
+    "postcss": "^8.5.8",
     "react": "18",
     "react-dom": "18",
     "resend": "latest",
-    "zod": "latest"
+    "tailwindcss": "^3.4.19",
+    "zod": "latest",
+    "@types/node": "25.5.2",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "latest",
+    "typescript": "latest"
   },
   "devDependencies": {
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "autoprefixer": "^10.4.27",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.35",
-    "postcss": "^8.5.8",
     "prisma": "^6.19.3",
-    "tailwindcss": "^3.4.17",
-    "tsx": "latest",
-    "typescript": "latest"
+    "tsx": "latest"
   }
 }
