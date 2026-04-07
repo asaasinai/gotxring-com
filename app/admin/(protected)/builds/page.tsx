@@ -1,6 +1,7 @@
 import { Build } from '@prisma/client';
 
 import { deleteBuildAction, upsertBuildAction } from '@/lib/actions';
+import { ImageEditor } from '@/components/image-editor';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -37,16 +38,7 @@ function BuildForm({ build }: { build?: Build }) {
         <textarea className="input min-h-20" name="description" required defaultValue={build?.description} />
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <div>
-          <label className="label">Upload Image (jpg/png/webp)</label>
-          <input className="input" type="file" accept="image/jpeg,image/png,image/webp" name="image" />
-        </div>
-        <div>
-          <label className="label">Or image URL fallback</label>
-          <input className="input" name="imageUrl" defaultValue={build?.imageUrl ?? ''} />
-        </div>
-      </div>
+      <ImageEditor urlInputName="imageUrl" currentUrl={build?.imageUrl} label="Build Image" />
 
       <div>
         <label className="label">Specifications (JSON)</label>

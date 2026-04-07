@@ -1,6 +1,7 @@
 import { Champion } from '@prisma/client';
 
 import { deleteChampionAction, upsertChampionAction } from '@/lib/actions';
+import { ImageEditor } from '@/components/image-editor';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -32,16 +33,7 @@ function ChampionForm({ champion }: { champion?: Champion }) {
         <input className="input" name="loadout" required defaultValue={champion?.loadout} />
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <div>
-          <label className="label">Upload Image (jpg/png/webp)</label>
-          <input className="input" type="file" accept="image/jpeg,image/png,image/webp" name="image" />
-        </div>
-        <div>
-          <label className="label">Or image URL fallback</label>
-          <input className="input" name="imageUrl" defaultValue={champion?.imageUrl ?? ''} />
-        </div>
-      </div>
+      <ImageEditor urlInputName="imageUrl" currentUrl={champion?.imageUrl} label="Champion Photo" />
 
       <label className="flex items-center gap-2 text-sm text-zinc-300">
         <input type="checkbox" name="featured" defaultChecked={champion?.featured} /> Featured

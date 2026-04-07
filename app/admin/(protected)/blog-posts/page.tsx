@@ -1,6 +1,7 @@
 import { BlogPost } from '@prisma/client';
 
 import { deleteBlogPostAction, upsertBlogPostAction } from '@/lib/actions';
+import { ImageEditor } from '@/components/image-editor';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -37,16 +38,7 @@ function BlogPostForm({ post }: { post?: BlogPost }) {
         <label className="label">Content</label>
         <textarea className="input min-h-28" name="content" required defaultValue={post?.content} />
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        <div>
-          <label className="label">Upload Image (jpg/png/webp)</label>
-          <input className="input" type="file" accept="image/jpeg,image/png,image/webp" name="image" />
-        </div>
-        <div>
-          <label className="label">Or image URL fallback</label>
-          <input className="input" name="imageUrl" defaultValue={post?.imageUrl ?? ''} />
-        </div>
-      </div>
+      <ImageEditor urlInputName="imageUrl" currentUrl={post?.imageUrl} label="Post Image" />
       <div>
         <label className="label">Source URL</label>
         <input className="input" name="sourceUrl" defaultValue={post?.sourceUrl ?? ''} />

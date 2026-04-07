@@ -1,4 +1,5 @@
 import { upsertHeroAction } from '@/lib/actions';
+import { ImageEditor } from '@/components/image-editor';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -29,16 +30,7 @@ export default async function AdminHeroPage() {
             <input className="input" name="ctaButtonUrl" required defaultValue={hero?.ctaButtonUrl ?? '/order'} />
           </div>
         </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="label">Background Image Upload</label>
-            <input className="input" type="file" name="backgroundImage" accept="image/jpeg,image/png,image/webp" />
-          </div>
-          <div>
-            <label className="label">Or Background Image URL</label>
-            <input className="input" name="backgroundImageUrl" defaultValue={hero?.backgroundImage ?? ''} />
-          </div>
-        </div>
+        <ImageEditor urlInputName="backgroundImageUrl" currentUrl={hero?.backgroundImage} label="Background Image" />
         <button className="btn-primary w-fit">Save Hero</button>
       </form>
     </div>

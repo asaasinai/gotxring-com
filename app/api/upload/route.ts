@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 
-import { requireAdminSession } from '@/lib/auth';
+import { getAdminSession } from '@/lib/auth';
 import { uploadImageFromFormData } from '@/lib/upload';
 
 export async function POST(request: Request) {
-  requireAdminSession();
+  const session = getAdminSession();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
+  }
 
   const formData = await request.formData();
   const file = formData.get('file');
@@ -21,6 +24,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ url });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Upload failed.';
-    return NextResponse.json({ error: message }, { status: 400 });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

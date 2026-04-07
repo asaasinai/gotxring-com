@@ -3,6 +3,7 @@ import { PressItem } from '@prisma/client';
 export const dynamic = 'force-dynamic';
 
 import { deletePressItemAction, upsertPressItemAction } from '@/lib/actions';
+import { ImageEditor } from '@/components/image-editor';
 import { prisma } from '@/lib/prisma';
 
 function PressItemForm({ item }: { item?: PressItem }) {
@@ -42,16 +43,7 @@ function PressItemForm({ item }: { item?: PressItem }) {
         />
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <div>
-          <label className="label">Upload Image (jpg/png/webp)</label>
-          <input className="input" type="file" accept="image/jpeg,image/png,image/webp" name="image" />
-        </div>
-        <div>
-          <label className="label">Or image URL fallback</label>
-          <input className="input" name="imageUrl" defaultValue={item?.imageUrl ?? ''} />
-        </div>
-      </div>
+      <ImageEditor urlInputName="imageUrl" currentUrl={item?.imageUrl} label="Press Image" />
 
       <label className="flex items-center gap-2 text-sm text-zinc-300">
         <input type="checkbox" name="featured" defaultChecked={item?.featured} /> Featured
