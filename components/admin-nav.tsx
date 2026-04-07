@@ -8,10 +8,10 @@ const tabs = [
   { href: '/admin/champions', label: 'Champions' },
   { href: '/admin/blog-posts', label: 'Blog Posts' },
   { href: '/admin/press-items', label: 'Press Items' },
-  { href: '/admin/orders', label: 'Orders' },
   { href: '/admin/rss-feeds', label: 'RSS Feeds' },
   { href: '/admin/content', label: 'Page Content' },
-  { href: '/admin/settings', label: 'Settings' }
+  { href: '/admin/settings', label: 'Settings' },
+  { href: '/admin/orders', label: 'Orders', red: true },
 ];
 
 export function AdminNav() {
@@ -20,7 +20,10 @@ export function AdminNav() {
       <p className="text-xs uppercase tracking-[0.2em] text-zinc-400">Admin Panel</p>
       <nav className="mt-3 grid gap-2">
         {tabs.map((tab) => (
-          <Link key={tab.href} href={tab.href} className="rounded border border-zinc-800 px-3 py-2 text-sm hover:border-zinc-600">
+          <Link key={tab.href} href={tab.href}
+            className={`rounded border px-3 py-2 text-sm ${'red' in tab && tab.red
+              ? 'border-[#C8102E]/60 bg-[#C8102E]/10 text-[#C8102E] hover:bg-[#C8102E]/20'
+              : 'border-zinc-800 hover:border-zinc-600'}`}>
             {tab.label}
           </Link>
         ))}
