@@ -172,16 +172,51 @@ function OrderCard({ order }: { order: Order }) {
 
 export function OrderQueue({ orders }: { orders: Order[] }) {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+
+  const searched = query.trim()
+    ? orders.filter((o) => {
+        const q = query.toLowerCase();
+        return (
+          o.customerName.toLowerCase().includes(q) ||
+          o.selectedSystem.toLowerCase().includes(q) ||
+          o.orderType.toLowerCase().includes(q) ||
+          o.email.toLowerCase().includes(q) ||
+          (o.caliber ?? '').toLowerCase().includes(q) ||
+          (o.discipline ?? '').toLowerCase().includes(q) ||
+          (o.finishColor ?? '').toLowerCase().includes(q) ||
+          (o.options ?? '').toLowerCase().includes(q) ||
+          o.shippingAddress.toLowerCase().includes(q)
+        );
+      })
+    : orders;
 
   const filtered = activeFilter
-    ? orders.filter((o) => o.status === activeFilter)
-    : orders;
+    ? searched.filter((o) => o.status === activeFilter)
+    : searched;
 
   const active = filtered.filter((o) => o.status !== 'Complete' && o.status !== 'Cancelled');
   const done = filtered.filter((o) => o.status === 'Complete' || o.status === 'Cancelled');
 
   return (
     <div className="grid gap-8">
+      {/* Search */}
+      <div className="relative">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">⌕</span>
+        <input
+          className="input pl-8 w-full"
+          placeholder="Search by name, system, caliber, email, discipline…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        {query && (
+          <button type="button" onClick={() => setQuery('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white text-sm">
+            ✕
+          </button>
+        )}
+      </div>
+
       {/* Pipeline tiles */}
       <div className="flex flex-wrap gap-2">
         {STATUSES.filter((s) => s !== 'Cancelled').map((s) => {
@@ -232,8 +267,10 @@ export function OrderQueue({ orders }: { orders: Order[] }) {
         </div>
       )}
 
-      {filtered.length === 0 && (
-        <p className="text-sm text-zinc-500">No orders with status &ldquo;{activeFilter}&rdquo;.</p>
+      {filtered.length === 0 && orders.length > 0 && (
+        <p className="text-sm text-zinc-500">
+          No orders match{query ? ` "${query}"` : ''}{activeFilter ? ` in "${activeFilter}"` : ''}.
+        </p>
       )}
 
       {orders.length === 0 && (
