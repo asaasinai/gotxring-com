@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function BuildsPage() {
   const [builds, content] = await Promise.all([
-    prisma.build.findMany({ orderBy: { createdAt: 'desc' } }),
+    prisma.build.findMany({ orderBy: { createdAt: 'desc' }, include: { images: { orderBy: { sortOrder: 'asc' } } } }),
     getManyContent(['builds_title', 'builds_subtext'])
   ]);
 

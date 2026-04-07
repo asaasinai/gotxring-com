@@ -10,9 +10,11 @@ interface Props {
   /** Existing image URL to show as preview */
   currentUrl?: string | null;
   label?: string;
+  /** Called immediately after a successful upload with the blob URL */
+  onUpload?: (url: string) => void;
 }
 
-export function ImageEditor({ urlInputName, currentUrl, label = 'Image' }: Props) {
+export function ImageEditor({ urlInputName, currentUrl, label = 'Image', onUpload }: Props) {
   const [open, setOpen] = useState(false);
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const [rotation, setRotation] = useState(0);
@@ -167,6 +169,7 @@ export function ImageEditor({ urlInputName, currentUrl, label = 'Image' }: Props
         if (!res.ok || !json.url) throw new Error(json.error ?? 'Upload failed');
         setUploadedUrl(json.url);
         setPreview(json.url);
+        onUpload?.(json.url);
         setOpen(false);
         setImgSrc(null);
         setRotation(0);
