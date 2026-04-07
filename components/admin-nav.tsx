@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { adminLogoutAction } from '@/lib/actions';
 
 const tabs = [
+  { href: '/admin/hero', label: 'Hero' },
   { href: '/admin/builds', label: 'Builds' },
   { href: '/admin/champions', label: 'Champions' },
   { href: '/admin/blog-posts', label: 'Blog Posts' },

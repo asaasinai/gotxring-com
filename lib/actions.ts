@@ -11,6 +11,7 @@ import {
   blogPostSchema,
   buildSchema,
   championSchema,
+  heroSchema,
   orderSchema,
   pressItemSchema,
   rssFeedSchema,
@@ -430,4 +431,34 @@ export async function updateSettingsAction(formData: FormData): Promise<void> {
   }
 
   revalidatePath('/admin/settings');
+}
+
+export async function upsertHeroAction(formData: FormData): Promise<void> {
+  requireAdminSession();
+  const id = asString(formData.get('id'));
+  const backgroundImage = await resolveImageUrl(formData, 'backgroundImage');
+  const parsed = heroSchema.parse({
+    headline: asString(formData.get('headline')),
+    subheadline: asString(formData.get('subheadline')),
+    ctaButtonText: asString(formData.get('ctaButtonText')),
+    ctaButtonUrl: asString(formData.get('ctaButtonUrl')),
+    backgroundImage
+  });
+
+  const data = {
+    headline: parsed.headline,
+    subheadline: parsed.subheadline,
+    ctaButtonText: parsed.ctaButtonText,
+    ctaButtonUrl: parsed.ctaButtonUrl,
+    backgroundImage: parsed.backgroundImage || null
+  };
+
+  if (id) {
+    await prisma.hero.update({ where: { id }, data });
+  } else {
+    await prisma.hero.create({ data });
+  }
+
+  revalidatePath('/');
+  revalidatePath('/admin/hero');
 }

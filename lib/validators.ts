@@ -68,3 +68,11 @@ export const orderSchema = z.object({
 export const settingsSchema = z.object({
   notificationEmail: z.string().email()
 });
+
+export const heroSchema = z.object({
+  headline: z.string().min(2),
+  subheadline: z.string().min(10),
+  ctaButtonText: z.string().min(2),
+  ctaButtonUrl: z.string().min(1),
+  backgroundImage: z.string().url().optional().or(z.literal(''))
+});

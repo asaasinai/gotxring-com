@@ -1,35 +1,53 @@
 import Link from 'next/link';
 
+import { ChampionsClient } from '@/components/champions-client';
 import { prisma } from '@/lib/prisma';
 import { formatDate } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
+const defaultHero = {
+  headline: 'Engineered for the Win.',
+  subheadline:
+    'Custom precision rifle systems built for decisive performance across F-Class, PRS, tactical, and long-range hunting disciplines.',
+  ctaButtonText: 'Configure Your Build',
+  ctaButtonUrl: '/order',
+  backgroundImage: ''
+};
+
 export default async function HomePage() {
-  const [builds, champions, posts, press] = await Promise.all([
+  const [builds, champions, posts, press, hero] = await Promise.all([
     prisma.build.findMany({ orderBy: { createdAt: 'desc' }, take: 3 }),
     prisma.champion.findMany({ where: { featured: true }, orderBy: { createdAt: 'desc' }, take: 4 }),
     prisma.blogPost.findMany({ where: { published: true }, orderBy: { publishedAt: 'desc' }, take: 3 }),
-    prisma.pressItem.findMany({ orderBy: { publishedAt: 'desc' }, take: 3 })
+    prisma.pressItem.findMany({ orderBy: { publishedAt: 'desc' }, take: 3 }),
+    prisma.hero.findFirst({ orderBy: { updatedAt: 'desc' } })
   ]);
+
+  const heroContent = hero ?? defaultHero;
 
   return (
     <div>
-      <section className="border-b border-zinc-800 bg-gradient-to-br from-black to-[#111111]">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-20 md:px-8">
+      <section
+        className="border-b border-zinc-800 bg-gradient-to-br from-black to-[#111111]"
+        style={{
+          backgroundImage: heroContent.backgroundImage
+            ? `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.78)), url(${heroContent.backgroundImage})`
+            : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-24 md:px-8">
           <p className="text-xs uppercase tracking-[0.3em] text-zinc-300">Competition Machine Inc</p>
-          <h1 className="max-w-4xl text-4xl font-bold uppercase leading-tight md:text-6xl">
-            Precision rifle systems built for <span className="text-[#C8102E]">decisive performance</span>
-          </h1>
-          <p className="max-w-2xl text-zinc-300">
-            GotXRing delivers elite custom rifles engineered for F-Class, PRS, tactical, and long-range hunting disciplines.
-          </p>
+          <h1 className="max-w-4xl text-4xl font-bold uppercase leading-tight md:text-6xl">{heroContent.headline}</h1>
+          <p className="max-w-2xl text-zinc-200">{heroContent.subheadline}</p>
           <div className="flex gap-3">
-            <Link className="btn-primary" href="/builds">
-              Explore Builds
+            <Link className="btn-primary" href={heroContent.ctaButtonUrl}>
+              {heroContent.ctaButtonText}
             </Link>
-            <Link className="btn-muted" href="/order">
-              Start Your Order
+            <Link className="btn-muted" href="/builds">
+              Explore Builds
             </Link>
           </div>
         </div>
@@ -45,7 +63,10 @@ export default async function HomePage() {
         <div className="grid gap-5 md:grid-cols-3">
           {builds.map((build) => (
             <article key={build.id} className="section-shell rounded-lg p-4">
-              <div className="mb-3 h-40 rounded bg-zinc-900" style={{ backgroundImage: `url(${build.imageUrl ?? ''})`, backgroundSize: 'cover' }} />
+              <div
+                className="mb-3 h-40 rounded bg-zinc-900"
+                style={{ backgroundImage: `url(${build.imageUrl ?? ''})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+              />
               <p className="text-xs uppercase tracking-[0.16em] text-[#C8102E]">{build.discipline}</p>
               <h3 className="mt-1 text-lg font-semibold">{build.name}</h3>
               <p className="text-sm text-zinc-300">{build.caliber}</p>
@@ -57,15 +78,7 @@ export default async function HomePage() {
       <section className="border-y border-zinc-800 bg-[#111111]/70">
         <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-14 md:px-8">
           <h2 className="text-2xl font-bold uppercase tracking-[0.12em]">Champions Circle</h2>
-          <div className="grid gap-5 md:grid-cols-2">
-            {champions.map((champion) => (
-              <article key={champion.id} className="section-shell rounded-lg p-5">
-                <p className="text-sm text-zinc-300">{champion.title}</p>
-                <h3 className="mt-1 text-xl font-semibold">{champion.name}</h3>
-                <p className="mt-3 text-zinc-200">“{champion.quote}”</p>
-              </article>
-            ))}
-          </div>
+          <ChampionsClient champions={champions} />
         </div>
       </section>
 

@@ -4,6 +4,14 @@ const prisma = new PrismaClient();
 
 const defaultNotificationEmail = 'spraynandprayn@gmail.com';
 
+const defaultHero = {
+  headline: 'Engineered for the Win.',
+  subheadline: 'Custom precision rifle systems built for decisive performance across F-Class, PRS, tactical, and long-range hunting disciplines.',
+  ctaButtonText: 'Configure Your Build',
+  ctaButtonUrl: '/order',
+  backgroundImage: 'https://images.unsplash.com/photo-1511886929837-354d827aae26?auto=format&fit=crop&w=1600&q=80'
+};
+
 const builds: Prisma.BuildCreateInput[] = [
   {
     name: 'Titanium F-Class Dominator',
@@ -269,11 +277,16 @@ async function main() {
   await prisma.champion.deleteMany();
   await prisma.build.deleteMany();
   await prisma.settings.deleteMany();
+  await prisma.hero.deleteMany();
 
   await prisma.settings.create({
     data: {
       notificationEmail: defaultNotificationEmail
     }
+  });
+
+  await prisma.hero.create({
+    data: defaultHero
   });
 
   for (const build of builds) {

@@ -32,6 +32,17 @@ model Champion {
   createdAt    DateTime @default(now())
 }
 
+model Hero {
+  id              String   @id @default(cuid())
+  headline        String
+  subheadline     String
+  ctaButtonText   String
+  ctaButtonUrl    String
+  backgroundImage String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
 model BlogPost {
   id          String    @id @default(cuid())
   title       String
@@ -60,21 +71,21 @@ model PressItem {
 }
 
 model Order {
-  id                     String   @id @default(cuid())
-  customerName           String
-  email                  String
-  shippingAddress        String
-  phone                  String
+  id                      String   @id @default(cuid())
+  customerName            String
+  email                   String
+  shippingAddress         String
+  phone                   String
   chassisModelOrPartModel String?
-  handedness             String?
-  finishColor            String?
-  options                String?
-  specialInstructions    String?
-  discipline             String?
-  caliber                String?
-  notes                  String?
-  status                 String   @default("Pending")
-  createdAt              DateTime @default(now())
+  handedness              String?
+  finishColor             String?
+  options                 String?
+  specialInstructions     String?
+  discipline              String?
+  caliber                 String?
+  notes                   String?
+  status                  String   @default("Pending")
+  createdAt               DateTime @default(now())
 }
 
 model RssFeed {

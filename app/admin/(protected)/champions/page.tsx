@@ -25,7 +25,7 @@ function ChampionForm({ champion }: { champion?: Champion }) {
       </div>
       <div>
         <label className="label">Achievements</label>
-        <textarea className="input min-h-20" name="achievements" required defaultValue={champion?.achievements} />
+        <textarea className="input min-h-32" name="achievements" required defaultValue={champion?.achievements} />
       </div>
       <div>
         <label className="label">Loadout</label>
