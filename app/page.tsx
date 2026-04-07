@@ -2,8 +2,10 @@ import Link from 'next/link';
 
 import { ChampionsClient } from '@/components/champions-client';
 import { ProductCatalog } from '@/components/product-catalog';
+import { YoutubeFeed } from '@/components/youtube-feed';
 import { prisma } from '@/lib/prisma';
 import { formatDate } from '@/lib/utils';
+import { getYoutubeVideos } from '@/lib/youtube';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,12 +19,13 @@ const defaultHero = {
 };
 
 export default async function HomePage() {
-  const [builds, champions, posts, press, hero] = await Promise.all([
+  const [builds, champions, posts, press, hero, videos] = await Promise.all([
     prisma.build.findMany({ orderBy: [{ category: 'asc' }, { subcategory: 'asc' }, { sortOrder: 'asc' }, { createdAt: 'asc' }], include: { images: { orderBy: { sortOrder: 'asc' } } } }),
     prisma.champion.findMany({ where: { featured: true }, orderBy: { createdAt: 'desc' }, take: 4 }),
     prisma.blogPost.findMany({ where: { published: true }, orderBy: { publishedAt: 'desc' }, take: 3 }),
     prisma.pressItem.findMany({ orderBy: { publishedAt: 'desc' }, take: 3 }),
-    prisma.hero.findFirst({ orderBy: { updatedAt: 'desc' } })
+    prisma.hero.findFirst({ orderBy: { updatedAt: 'desc' } }),
+    getYoutubeVideos(),
   ]);
 
   const heroContent = hero ?? defaultHero;
@@ -140,6 +143,32 @@ export default async function HomePage() {
           <p className="mt-4 text-xs text-zinc-500">No payment required · Response within 24 hours</p>
         </div>
       </section>
+
+      {/* ── YouTube Videos ── */}
+      {videos.length > 0 && (
+        <section className="border-y border-zinc-800 bg-[#0d0d0d]">
+          <div className="mx-auto w-full max-w-7xl px-4 py-14 md:px-8">
+            <div className="mb-8 flex items-end justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-[#C8102E]">From the Shop Floor</p>
+                <h2 className="mt-1 text-2xl font-bold uppercase tracking-[0.12em]">Build Process Videos</h2>
+              </div>
+              <a
+                href="https://www.youtube.com/@garyeliseo1775"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 text-xs text-zinc-400 hover:text-white transition flex items-center gap-1.5"
+              >
+                <svg className="h-4 w-4 text-[#FF0000]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+                View all on YouTube →
+              </a>
+            </div>
+            <YoutubeFeed videos={videos} />
+          </div>
+        </section>
+      )}
 
       {/* ── Follow ── */}
       <section className="border-t border-zinc-800 bg-[#111111]/70">
