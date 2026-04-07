@@ -6,6 +6,7 @@ export const dynamic = 'force-dynamic';
 export default async function AdminContentPage() {
   const content = await getManyContent(Object.keys(CONTENT_KEYS) as (keyof typeof CONTENT_KEYS)[]);
 
+
   return (
     <div className="grid gap-6">
       <h1 className="text-3xl font-bold">Page Content</h1>
@@ -51,6 +52,23 @@ export default async function AdminContentPage() {
             <label className="grid gap-1.5">
               <span className="label">Address</span>
               <textarea name="contact_address" rows={3} className="input resize-none" defaultValue={content.contact_address} placeholder="123 Main St&#10;City, ST 00000" />
+            </label>
+          </div>
+        </fieldset>
+
+        {/* Order / Lead Time */}
+        <fieldset className="section-shell rounded-lg p-5">
+          <legend className="px-1 text-xs uppercase tracking-[0.2em] text-zinc-400">Order / Lead Time</legend>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <label className="grid gap-1.5">
+              <span className="label">Lead Time</span>
+              <input name="lead_time" className="input" defaultValue={content.lead_time} placeholder="e.g. 8–10 weeks" />
+              <span className="text-[11px] text-zinc-500">Shown on the order form and in the sitewide footer banner.</span>
+            </label>
+            <label className="grid gap-1.5">
+              <span className="label">Order Help Phone</span>
+              <input name="order_phone" className="input" defaultValue={content.order_phone} placeholder="e.g. 928-649-0742" />
+              <span className="text-[11px] text-zinc-500">Shown on the order form as "Need help ordering?"</span>
             </label>
           </div>
         </fieldset>

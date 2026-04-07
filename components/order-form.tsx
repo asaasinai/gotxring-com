@@ -38,6 +38,8 @@ type Props = {
   initialCaliber?: string;
   initialDiscipline?: string;
   initialStep?: number;
+  leadTime?: string;
+  orderPhone?: string;
 };
 
 function StepIndicator({ current }: { current: number }) {
@@ -110,6 +112,8 @@ export function OrderForm({
   initialCaliber = '',
   initialDiscipline = '',
   initialStep = 0,
+  leadTime = '8–10 weeks',
+  orderPhone = '928-649-0742',
 }: Props) {
   const [step, setStep] = useState(Math.min(initialStep, REVIEW_STEP));
   const [state, setState] = useState<FormState>({});
@@ -225,6 +229,15 @@ export function OrderForm({
 
   return (
     <div className="section-shell rounded-xl p-6 md:p-8">
+      {/* Help line */}
+      <div className="mb-5 flex items-center justify-between gap-2 text-sm">
+        <span className="text-zinc-500">Need help ordering?</span>
+        <a href={`tel:${orderPhone.replace(/\D/g, '')}`}
+          className="font-semibold text-white transition hover:text-[#C8102E]">
+          Call {orderPhone}
+        </a>
+      </div>
+
       <StepIndicator current={step} />
 
       {/* Lead time note — visible on Build step and beyond */}
@@ -232,8 +245,7 @@ export function OrderForm({
         <div className="mb-6 flex items-start gap-3 rounded-lg border border-zinc-800 bg-black/30 px-4 py-3 text-xs text-zinc-400">
           <span className="mt-0.5 text-zinc-500">⏱</span>
           <span>
-            Typical lead time: <strong className="text-zinc-200">8–16 weeks</strong> · Starting from{' '}
-            <strong className="text-zinc-200">$2,500</strong> — we confirm all pricing before any commitment.
+            Lead time: <strong className="text-zinc-200">{leadTime}</strong> — we confirm all pricing before any commitment.
           </span>
         </div>
       )}

@@ -1,6 +1,9 @@
 import { Suspense } from 'react';
 
 import { OrderForm } from '@/components/order-form';
+import { getManyContent } from '@/lib/content';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Order | GotXRing'
@@ -14,7 +17,8 @@ function str(v: string | string[] | undefined): string {
   return typeof v === 'string' ? v : '';
 }
 
-export default function OrderPage({ searchParams }: Props) {
+export default async function OrderPage({ searchParams }: Props) {
+  const content = await getManyContent(['lead_time', 'order_phone']);
   const rawCategory = str(searchParams.category);
   const orderType: 'Chassis System' | 'Full Rifle System' | '' =
     rawCategory.startsWith('Full') ? 'Full Rifle System' :
@@ -48,6 +52,8 @@ export default function OrderPage({ searchParams }: Props) {
             initialCaliber={str(searchParams.caliber)}
             initialDiscipline={str(searchParams.discipline)}
             initialStep={initialStep}
+            leadTime={content.lead_time}
+            orderPhone={content.order_phone}
           />
         </Suspense>
       </div>

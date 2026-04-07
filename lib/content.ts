@@ -9,6 +9,8 @@ export const CONTENT_KEYS = {
   contact_address: '',
   contact_phone: '',
   contact_email: '',
+  lead_time: '8–10 weeks',
+  order_phone: '928-649-0742',
 } as const;
 
 export type ContentKey = keyof typeof CONTENT_KEYS;
