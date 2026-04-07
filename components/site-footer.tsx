@@ -2,7 +2,7 @@ export function SiteFooter({ leadTime = '8–10 weeks' }: { leadTime?: string })
   return (
     <footer className="border-t border-zinc-800">
       {/* Lead time banner */}
-      <div className="bg-[#C8102E] px-4 py-2.5 text-center text-sm font-semibold text-white">
+      <div className="bg-[#C8102E] px-4 py-3 text-center text-sm font-semibold text-white">
         Lead Time: {leadTime} — No payment required until your build is confirmed.
       </div>
 

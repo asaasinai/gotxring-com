@@ -240,8 +240,8 @@ export function OrderForm({
 
       <StepIndicator current={step} />
 
-      {/* Lead time note — visible on Build step and beyond */}
-      {step >= 2 && step < REVIEW_STEP && (
+      {/* Lead time note — visible on all steps before review */}
+      {step < REVIEW_STEP && (
         <div className="mb-6 flex items-start gap-3 rounded-lg border border-zinc-800 bg-black/30 px-4 py-3 text-xs text-zinc-400">
           <span className="mt-0.5 text-zinc-500">⏱</span>
           <span>

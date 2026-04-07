@@ -97,7 +97,7 @@ export default async function AdminContentPage() {
           </div>
         </fieldset>
 
-        <button type="submit" className="btn-primary w-fit">Save All Settings</button>
+        <button type="submit" className="btn-primary w-full sm:w-fit">Save All Settings</button>
       </form>
     </div>
   );
