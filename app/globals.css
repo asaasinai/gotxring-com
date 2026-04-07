@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: #0a0a0a;
+  color: #ffffff;
+}
+
+body {
+  min-height: 100vh;
+  background-image: radial-gradient(circle at top right, rgba(200, 16, 46, 0.18), transparent 45%),
+    radial-gradient(circle at bottom left, rgba(200, 16, 46, 0.12), transparent 35%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.section-shell {
+  @apply border border-zinc-800 bg-[#111111]/80 backdrop-blur;
+}
+
+.input {
+  @apply w-full rounded-md border border-zinc-700 bg-black px-3 py-2 text-sm text-white outline-none transition focus:border-[#C8102E];
+}
+
+.label {
+  @apply mb-1 block text-xs font-semibold uppercase tracking-[0.18em] text-zinc-300;
+}
+
+.btn-primary {
+  @apply rounded-md bg-[#C8102E] px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700;
+}
+
+.btn-muted {
+  @apply rounded-md border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200 transition hover:border-zinc-500;
+}
