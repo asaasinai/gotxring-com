@@ -1,0 +1,43 @@
+{
+  "name": "gotxring-com",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "prisma db seed",
+    "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "@vercel/blob": "latest",
+    "autoprefixer": "^10.4.27",
+    "bcryptjs": "latest",
+    "next": "14",
+    "postcss": "^8.5.8",
+    "react": "18",
+    "react-dom": "18",
+    "resend": "latest",
+    "tailwindcss": "^3.4.19",
+    "zod": "latest",
+    "@types/node": "25.5.2",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "latest",
+    "typescript": "latest",
+    "prisma": "^6.19.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.35",
+    "tsx": "latest"
+  }
+}

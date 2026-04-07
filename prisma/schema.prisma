@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Build {
+  id             String   @id @default(cuid())
+  name           String
+  description    String
+  discipline     String
+  chassisType    String
+  caliber        String
+  imageUrl       String?
+  specifications Json
+  featured       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+}
+
+model Champion {
+  id           String   @id @default(cuid())
+  name         String
+  title        String
+  quote        String
+  imageUrl     String?
+  achievements String
+  loadout      String
+  featured     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
+
+model Hero {
+  id              String   @id @default(cuid())
+  headline        String
+  subheadline     String
+  ctaButtonText   String
+  ctaButtonUrl    String
+  backgroundImage String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model BlogPost {
+  id          String    @id @default(cuid())
+  title       String
+  content     String
+  excerpt     String
+  slug        String    @unique
+  category    String
+  imageUrl    String?
+  published   Boolean   @default(false)
+  sourceUrl   String?
+  author      String
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model PressItem {
+  id          String   @id @default(cuid())
+  title       String
+  publication String
+  url         String
+  imageUrl    String?
+  publishedAt DateTime
+  category    String
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Order {
+  id                      String   @id @default(cuid())
+  customerName            String
+  email                   String
+  shippingAddress         String
+  phone                   String
+  chassisModelOrPartModel String?
+  handedness              String?
+  finishColor             String?
+  options                 String?
+  specialInstructions     String?
+  discipline              String?
+  caliber                 String?
+  notes                   String?
+  status                  String   @default("Pending")
+  createdAt               DateTime @default(now())
+}
+
+model RssFeed {
+  id            String    @id @default(cuid())
+  name          String
+  url           String
+  category      String
+  active        Boolean   @default(true)
+  lastFetchedAt DateTime?
+  createdAt     DateTime  @default(now())
+  items         RssItem[]
+}
+
+model RssItem {
+  id          String   @id @default(cuid())
+  feedId      String
+  title       String
+  url         String
+  excerpt     String?
+  imageUrl    String?
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  feed        RssFeed  @relation(fields: [feedId], references: [id], onDelete: Cascade)
+}
+
+model Settings {
+  id                String   @id @default(cuid())
+  notificationEmail String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
