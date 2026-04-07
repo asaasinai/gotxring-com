@@ -68,6 +68,12 @@ export function ImageEditor({ urlInputName, currentUrl, label = 'Image', onUploa
     if (imgRef.current) redrawBase();
   }, [rotation, redrawBase]);
 
+  // When modal opens and image is already loaded, trigger a redraw
+  // (canvas doesn't exist in the DOM until the modal renders)
+  useEffect(() => {
+    if (open && imgRef.current) redrawBase();
+  }, [open, redrawBase]);
+
   // Draw crop overlay
   useEffect(() => {
     const overlay = overlayRef.current;

@@ -164,10 +164,10 @@ export async function upsertChampionAction(formData: FormData): Promise<void> {
   const data = {
     name: parsed.name,
     title: parsed.title,
-    quote: parsed.quote,
+    quote: parsed.quote ?? '',
     imageUrl: parsed.imageUrl || null,
     achievements: parsed.achievements,
-    loadout: parsed.loadout,
+    loadout: parsed.loadout ?? '',
     featured: parsed.featured ?? false
   };
 

@@ -17,10 +17,10 @@ export const buildSchema = z.object({
 export const championSchema = z.object({
   name: z.string().min(2),
   title: z.string().min(2),
-  quote: z.string().min(2),
+  quote: z.string().optional().or(z.literal('')),
   imageUrl: z.string().url().optional().or(z.literal('')),
   achievements: z.string().min(2),
-  loadout: z.string().min(2),
+  loadout: z.string().optional().or(z.literal('')),
   featured: z.boolean().optional()
 });
 
