@@ -1,9 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 
-const filters = ['All', 'F-Class', 'PRS', 'Benchrest', 'Tactical', 'Hunting', 'Sporting'];
+import { accessoryInquiryAction } from '@/lib/actions';
+
+const filters = ['All', 'F-Class', 'PRS', 'Benchrest', 'Tactical', 'Hunting', 'Sporting', 'Accessories'];
 
 type BuildImage = { id: string; url: string; sortOrder: number };
 
@@ -11,6 +13,7 @@ type BuildCard = {
   id: string;
   name: string;
   description: string;
+  category: string;
   discipline: string;
   caliber: string;
   chassisType: string;
@@ -107,6 +110,13 @@ function ModalCarousel({ images }: { images: string[] }) {
 export function BuildsClient({ builds }: { builds: BuildCard[] }) {
   const [activeFilter, setActiveFilter] = useState('All');
   const [activeBuild, setActiveBuild] = useState<BuildCard | null>(null);
+  const [inquiryOpen, setInquiryOpen] = useState(false);
+  const [inquiryName, setInquiryName] = useState('');
+  const [inquiryEmail, setInquiryEmail] = useState('');
+  const [inquiryPhone, setInquiryPhone] = useState('');
+  const [inquiryDone, setInquiryDone] = useState(false);
+  const [inquiryError, setInquiryError] = useState('');
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     if (!activeBuild) return;
@@ -122,9 +132,38 @@ export function BuildsClient({ builds }: { builds: BuildCard[] }) {
   }, [activeBuild]);
 
   const filtered = useMemo(() => {
-    if (activeFilter === 'All') return builds;
-    return builds.filter((build) => normalizeDiscipline(build.discipline) === activeFilter);
+    if (activeFilter === 'All') return builds.filter((b) => b.category !== 'Accessories');
+    if (activeFilter === 'Accessories') return builds.filter((b) => b.category === 'Accessories');
+    return builds.filter((b) => b.category !== 'Accessories' && normalizeDiscipline(b.discipline) === activeFilter);
   }, [activeFilter, builds]);
+
+  function openBuild(build: BuildCard) {
+    setActiveBuild(build);
+    setInquiryOpen(false);
+    setInquiryDone(false);
+    setInquiryError('');
+    setInquiryName('');
+    setInquiryEmail('');
+    setInquiryPhone('');
+  }
+
+  function submitInquiry() {
+    if (!activeBuild) return;
+    setInquiryError('');
+    startTransition(async () => {
+      const result = await accessoryInquiryAction({
+        name: inquiryName,
+        email: inquiryEmail,
+        phone: inquiryPhone,
+        itemName: activeBuild.name,
+      });
+      if (result.ok) {
+        setInquiryDone(true);
+      } else {
+        setInquiryError(result.error ?? 'Something went wrong.');
+      }
+    });
+  }
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-12 md:px-8">
@@ -156,7 +195,7 @@ export function BuildsClient({ builds }: { builds: BuildCard[] }) {
               key={build.id}
               type="button"
               className="section-shell overflow-hidden rounded-lg text-left transition hover:border-zinc-600 active:scale-[0.99]"
-              onClick={() => setActiveBuild(build)}
+              onClick={() => openBuild(build)}
             >
               <div
                 className="relative aspect-video bg-zinc-900"
@@ -239,13 +278,70 @@ export function BuildsClient({ builds }: { builds: BuildCard[] }) {
                   </div>
                 </div>
 
-                <Link
-                  href={`/order?discipline=${encodeURIComponent(activeBuild.discipline)}&caliber=${encodeURIComponent(activeBuild.caliber)}`}
-                  className="btn-primary mt-auto text-center text-sm"
-                  onClick={() => setActiveBuild(null)}
-                >
-                  Build One Like This
-                </Link>
+                {activeBuild.category === 'Accessories' ? (
+                  <div className="mt-auto">
+                    {inquiryDone ? (
+                      <div className="rounded-xl border border-zinc-700 bg-zinc-900 p-5 text-center">
+                        <p className="text-lg font-bold text-white">Request Sent!</p>
+                        <p className="mt-1 text-sm text-zinc-300">We'll reach out to confirm availability and arrange shipping.</p>
+                      </div>
+                    ) : inquiryOpen ? (
+                      <div className="rounded-xl border border-zinc-700 bg-zinc-900 p-4 grid gap-3">
+                        <p className="text-sm font-semibold text-white">Request to Buy — {activeBuild.name}</p>
+                        <input
+                          className="input text-sm"
+                          placeholder="Full Name"
+                          value={inquiryName}
+                          onChange={(e) => setInquiryName(e.target.value)}
+                        />
+                        <input
+                          className="input text-sm"
+                          placeholder="Email Address"
+                          type="email"
+                          value={inquiryEmail}
+                          onChange={(e) => setInquiryEmail(e.target.value)}
+                        />
+                        <input
+                          className="input text-sm"
+                          placeholder="Phone Number"
+                          type="tel"
+                          value={inquiryPhone}
+                          onChange={(e) => setInquiryPhone(e.target.value)}
+                        />
+                        {inquiryError && <p className="text-xs text-red-400">{inquiryError}</p>}
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            className="btn-primary flex-1 text-sm disabled:opacity-50"
+                            disabled={isPending || !inquiryName || !inquiryEmail || !inquiryPhone}
+                            onClick={submitInquiry}
+                          >
+                            {isPending ? 'Sending…' : 'Send Request'}
+                          </button>
+                          <button type="button" className="btn-muted text-sm" onClick={() => setInquiryOpen(false)}>
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn-primary w-full text-center text-sm"
+                        onClick={() => setInquiryOpen(true)}
+                      >
+                        Request to Buy
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <Link
+                    href={`/order?discipline=${encodeURIComponent(activeBuild.discipline)}&caliber=${encodeURIComponent(activeBuild.caliber)}`}
+                    className="btn-primary mt-auto text-center text-sm"
+                    onClick={() => setActiveBuild(null)}
+                  >
+                    Build One Like This
+                  </Link>
+                )}
               </div>
             </div>
           </div>

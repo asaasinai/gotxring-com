@@ -217,8 +217,9 @@ export function ProductCatalog({ builds }: { builds: Build[] }) {
     new Set(builds.map((b) => b.discipline).filter(Boolean))
   ).sort()];
 
-  // Filter then regroup
-  const filtered = filter === 'All' ? builds : builds.filter((b) => b.discipline === filter);
+  // Filter then regroup (accessories are never shown in the systems catalog)
+  const filtered = (filter === 'All' ? builds : builds.filter((b) => b.discipline === filter))
+    .filter((b) => b.category !== 'Accessories');
 
   const categoryMap = new Map<string, Map<string, Build[]>>();
   for (const build of filtered) {

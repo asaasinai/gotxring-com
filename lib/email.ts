@@ -100,6 +100,39 @@ export async function sendContactEmail(contact: ContactEmailPayload): Promise<vo
   });
 }
 
+export async function sendAccessoryInquiryEmail(data: {
+  name: string;
+  email: string;
+  phone: string;
+  itemName: string;
+}): Promise<void> {
+  if (!resend) {
+    console.warn('RESEND_API_KEY not set, skipping accessory inquiry email.');
+    return;
+  }
+
+  const settings = await prisma.settings.findFirst();
+  const adminEmail = settings?.notificationEmail || 'spraynandprayn@gmail.com';
+
+  const html = wrapTemplate(
+    'Accessory Purchase Request',
+    `<p style="color:#e5e7eb;margin-top:0;">A customer has requested to purchase an accessory on GotXRing.com.</p>
+     <table style="width:100%;border-collapse:collapse;margin-top:12px;">
+       <tr><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#d1d5db;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;">Item</td><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#fff;">${data.itemName}</td></tr>
+       <tr><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#d1d5db;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;">Name</td><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#fff;">${data.name}</td></tr>
+       <tr><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#d1d5db;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;">Email</td><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#fff;">${data.email}</td></tr>
+       <tr><td style="padding:8px 12px;color:#d1d5db;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;">Phone</td><td style="padding:8px 12px;color:#fff;">${data.phone}</td></tr>
+     </table>`
+  );
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: adminEmail,
+    subject: `Accessory Request: ${data.name} — ${data.itemName}`,
+    html
+  });
+}
+
 export async function sendOrderEmails(order: OrderEmailPayload): Promise<void> {
   if (!resend) {
     console.warn('RESEND_API_KEY not set, skipping order emails.');

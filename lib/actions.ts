@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { Prisma } from '@prisma/client';
 
 import { clearAdminSession, createAdminSession, requireAdminSession, verifyAdminLogin } from '@/lib/auth';
-import { sendOrderEmails } from '@/lib/email';
+import { sendAccessoryInquiryEmail, sendOrderEmails } from '@/lib/email';
 import { prisma } from '@/lib/prisma';
 import { uploadImageFromFormData } from '@/lib/upload';
 import {
@@ -599,4 +599,22 @@ export async function deleteGalleryImageAction(formData: FormData): Promise<void
   revalidatePath('/');
   revalidatePath('/gallery');
   revalidatePath('/admin/gallery');
+}
+
+export async function accessoryInquiryAction(data: {
+  name: string;
+  email: string;
+  phone: string;
+  itemName: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  if (!data.name || !data.email || !data.phone) {
+    return { ok: false, error: 'All fields are required.' };
+  }
+  try {
+    await sendAccessoryInquiryEmail(data);
+    return { ok: true };
+  } catch (e) {
+    console.error('Accessory inquiry email failed', e);
+    return { ok: false, error: 'Failed to send. Please try again.' };
+  }
 }

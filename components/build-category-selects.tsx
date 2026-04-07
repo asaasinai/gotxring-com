@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 
-const CATEGORIES = ['Full Rifle Systems', 'Chassis Systems'];
+const CATEGORIES = ['Full Rifle Systems', 'Chassis Systems', 'Accessories'];
 const SUBCATEGORIES: Record<string, string[]> = {
   'Full Rifle Systems': ['Centerfire', 'Rimfire'],
   'Chassis Systems': ['Remington 700 Pattern', 'Tikka T3/T3x', 'Barnard Model P', 'Other'],
+  'Accessories': [],
 };
 
 export function BuildCategorySelects({
