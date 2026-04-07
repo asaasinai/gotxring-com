@@ -3,7 +3,6 @@
 import { useState } from 'react';
 
 import { upsertOrderAction } from '@/lib/actions';
-import type { ConfigGroup } from '@/app/order/page';
 
 type FormState = { success?: string; error?: string };
 
@@ -30,10 +29,7 @@ const FINISH_OPTIONS = [
   { value: 'Other', label: 'Other / TBD' },
 ];
 
-// Steps: for Full Rifle = Type, System, Build, Options, Info, Review (6)
-//        for Chassis    = Type, System, Build, Info, Review (5)
 const BASE_STEPS = ['Type', 'System', 'Build', 'Info', 'Review'];
-const RIFLE_STEPS = ['Type', 'System', 'Build', 'Options', 'Info', 'Review'];
 
 function StepIndicator({ steps, current }: { steps: string[]; current: number }) {
   return (
@@ -73,28 +69,6 @@ function SelectCard({ label, desc, selected, onClick }: { label: string; desc?: 
   );
 }
 
-function ImageCard({ label, desc, imageUrl, selected, onClick }: { label: string; desc?: string; imageUrl?: string | null; selected: boolean; onClick: () => void }) {
-  return (
-    <button type="button" onClick={onClick}
-      className={`rounded-xl border text-left transition overflow-hidden ${
-        selected ? 'border-[#C8102E] ring-1 ring-[#C8102E]/50' : 'border-zinc-800 hover:border-zinc-600'
-      }`}>
-      <div className="aspect-[4/3] bg-zinc-900 relative">
-        {imageUrl
-          ? <div className="absolute inset-0" style={{ backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-          : <div className="absolute inset-0 flex items-center justify-center text-zinc-700 text-xs uppercase tracking-wider">No image yet</div>
-        }
-        {selected && (
-          <div className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#C8102E] text-white text-xs font-bold">✓</div>
-        )}
-      </div>
-      <div className={`p-3 ${selected ? 'bg-[#C8102E]/10' : 'bg-zinc-900/50'}`}>
-        <p className="font-semibold text-sm text-white">{label}</p>
-        {desc && <p className="mt-0.5 text-xs text-zinc-400">{desc}</p>}
-      </div>
-    </button>
-  );
-}
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
@@ -105,7 +79,7 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function OrderForm({ configGroups }: { configGroups: ConfigGroup[] }) {
+export function OrderForm() {
   const [step, setStep] = useState(0);
   const [state, setState] = useState<FormState>({});
   const [pending, setPending] = useState(false);
@@ -122,24 +96,18 @@ export function OrderForm({ configGroups }: { configGroups: ConfigGroup[] }) {
   const [options, setOptions] = useState('');
   const [specialInstructions, setSpecialInstructions] = useState('');
 
-  // Config selections: { [groupId]: itemLabel }
-  const [configSelections, setConfigSelections] = useState<Record<string, string>>({});
-
   const [customerName, setCustomerName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [shippingAddress, setShippingAddress] = useState('');
 
-  const isFullRifle = orderType === 'Full Rifle System';
-  const steps = isFullRifle ? RIFLE_STEPS : BASE_STEPS;
-
-  // Map logical step index accounting for Options step only on Full Rifle
-  // Steps: 0=Type, 1=System, 2=Build, [3=Options if rifle], info, review
-  const infoStep = isFullRifle ? 4 : 3;
-  const reviewStep = isFullRifle ? 5 : 4;
+  const steps = BASE_STEPS;
+  const infoStep = 3;
+  const reviewStep = 4;
 
   const activeFinish = FINISH_OPTIONS.find((o) => o.value === finishType);
   const finishColor = finishType && colorName ? `${finishType} – ${colorName}` : finishType || colorName;
+  const isFullRifle = orderType === 'Full Rifle System';
 
   function systemOptions() {
     if (orderType === 'Chassis System') return CHASSIS_SYSTEMS;
@@ -155,7 +123,6 @@ export function OrderForm({ configGroups }: { configGroups: ConfigGroup[] }) {
       return !!subcategory && !!selectedSystem;
     }
     if (step === 2) return true;
-    if (step === 3 && isFullRifle) return true; // options optional
     if (step === infoStep) return !!customerName && !!email && !!phone && !!shippingAddress;
     return true;
   }
@@ -172,7 +139,6 @@ export function OrderForm({ configGroups }: { configGroups: ConfigGroup[] }) {
     fd.append('discipline', discipline);
     fd.append('options', options);
     fd.append('specialInstructions', specialInstructions);
-    fd.append('configSelections', JSON.stringify(configSelections));
     fd.append('customerName', customerName);
     fd.append('email', email);
     fd.append('phone', phone);
@@ -298,36 +264,6 @@ export function OrderForm({ configGroups }: { configGroups: ConfigGroup[] }) {
         </div>
       )}
 
-      {/* Step 3 — Config Options (Full Rifle only) */}
-      {step === 3 && isFullRifle && (
-        <div className="grid gap-10">
-          <h2 className="text-lg font-bold uppercase tracking-wide">Configuration Options</h2>
-          {configGroups.map((group) => (
-            <div key={group.id} className="grid gap-4">
-              <div>
-                <h3 className="font-semibold text-white">{group.name}</h3>
-                {group.description && <p className="mt-0.5 text-sm text-zinc-400">{group.description}</p>}
-              </div>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                {group.items.map((item) => (
-                  <ImageCard
-                    key={item.id}
-                    label={item.label}
-                    desc={item.description}
-                    imageUrl={item.imageUrl}
-                    selected={configSelections[group.id] === item.label}
-                    onClick={() => setConfigSelections((prev) => ({ ...prev, [group.id]: item.label }))}
-                  />
-                ))}
-              </div>
-              {!configSelections[group.id] && (
-                <p className="text-xs text-zinc-600 italic">Optional — skip if unsure, we will confirm before build starts</p>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
       {/* Info step */}
       {step === infoStep && (
         <div className="grid gap-4">
@@ -367,10 +303,6 @@ export function OrderForm({ configGroups }: { configGroups: ConfigGroup[] }) {
             {discipline && <Row label="Discipline" value={discipline} />}
             {options && <Row label="Options" value={options} />}
             {specialInstructions && <Row label="Special Instructions" value={specialInstructions} />}
-            {Object.entries(configSelections).map(([groupId, label]) => {
-              const group = configGroups.find((g) => g.id === groupId);
-              return group ? <Row key={groupId} label={group.name} value={label} /> : null;
-            })}
             <div className="my-2 border-t border-zinc-800" />
             <Row label="Name" value={customerName} />
             <Row label="Email" value={email} />
