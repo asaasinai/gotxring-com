@@ -467,7 +467,19 @@ export async function upsertOrderAction(formData: FormData): Promise<{ success?:
 
 export async function upsertContentAction(formData: FormData): Promise<void> {
   requireAdminSession();
-  const entries = Array.from(formData.entries()).filter(([k]) => k !== '__action');
+
+  // Save notification email to settings if included
+  const notificationEmail = formData.get('notificationEmail');
+  if (typeof notificationEmail === 'string' && notificationEmail.trim()) {
+    const existing = await prisma.settings.findFirst();
+    if (existing) {
+      await prisma.settings.update({ where: { id: existing.id }, data: { notificationEmail: notificationEmail.trim() } });
+    } else {
+      await prisma.settings.create({ data: { notificationEmail: notificationEmail.trim() } });
+    }
+  }
+
+  const entries = Array.from(formData.entries()).filter(([k]) => k !== '__action' && k !== 'notificationEmail');
   for (const [key, value] of entries) {
     if (typeof value !== 'string') continue;
     await prisma.siteContent.upsert({

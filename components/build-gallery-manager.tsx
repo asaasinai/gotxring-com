@@ -87,7 +87,7 @@ export function BuildGalleryManager({ buildId, images }: { buildId: string; imag
           </summary>
           <div className="p-3">
             <p className="mb-3 text-xs text-zinc-500">
-              Select an image, crop/rotate if needed, then click <strong className="text-zinc-300">Apply &amp; Upload</strong> — it saves automatically.
+              Choose an image below — it uploads and saves automatically.
             </p>
             <ImageEditor
               key={editorKey}

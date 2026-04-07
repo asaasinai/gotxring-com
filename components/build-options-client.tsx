@@ -94,18 +94,24 @@ function GroupSection({ group }: { group: GroupWithItems }) {
       </form>
 
       {/* Existing items */}
-      <div className="grid gap-4">
+      <div className="grid gap-2">
         <p className="text-xs uppercase tracking-wider text-zinc-500">Options ({group.items.length})</p>
         {group.items.map((item) => (
-          <div key={item.id} className="grid gap-1">
-            <ItemForm groupId={group.id} item={item} />
-            <form action={deleteConfigItemAction} onSubmit={(e) => {
-              if (!confirm(`Remove "${item.label}"? This cannot be undone.`)) e.preventDefault();
-            }}>
-              <input type="hidden" name="id" value={item.id} />
-              <button className="text-xs text-red-500 hover:text-red-300">Remove option</button>
-            </form>
-          </div>
+          <details key={item.id} className="rounded-lg border border-zinc-800 bg-black/20">
+            <summary className="flex cursor-pointer items-center justify-between gap-3 px-3 py-2 hover:bg-zinc-900/40 select-none">
+              <span className="text-sm text-zinc-200">{item.label}</span>
+              <span className="shrink-0 text-zinc-500 inline-block transition-transform [[open]_&]:rotate-180">▾</span>
+            </summary>
+            <div className="border-t border-zinc-800 p-3 grid gap-2">
+              <ItemForm groupId={group.id} item={item} />
+              <form action={deleteConfigItemAction} onSubmit={(e) => {
+                if (!confirm(`Remove "${item.label}"? This cannot be undone.`)) e.preventDefault();
+              }}>
+                <input type="hidden" name="id" value={item.id} />
+                <button className="text-xs text-red-500 hover:text-red-300">Remove option</button>
+              </form>
+            </div>
+          </details>
         ))}
       </div>
 

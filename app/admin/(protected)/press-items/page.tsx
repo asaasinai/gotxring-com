@@ -36,9 +36,9 @@ function PressItemForm({ item }: { item?: PressItem }) {
         <input
           className="input"
           name="publishedAt"
-          type="datetime-local"
+          type="date"
           required
-          defaultValue={item ? new Date(item.publishedAt).toISOString().slice(0, 16) : ''}
+          defaultValue={item ? new Date(item.publishedAt).toISOString().slice(0, 10) : ''}
         />
       </div>
       <ImageEditor urlInputName="imageUrl" currentUrl={item?.imageUrl} label="Press Image" />
@@ -64,6 +64,10 @@ export default async function AdminPressItemsPage() {
         <PressItemForm />
       </div>
 
+      {items.length === 0 && (
+        <p className="text-sm text-zinc-500">No press items yet. Add your first one above.</p>
+      )}
+
       {/* Existing */}
       {items.length > 0 && (
         <div className="grid gap-2">
@@ -75,7 +79,7 @@ export default async function AdminPressItemsPage() {
                   <span className="font-semibold text-zinc-200">{item.title}</span>
                   <span className="ml-2 text-xs text-zinc-500">{item.publication}</span>
                 </div>
-                <span className="text-xs text-zinc-500 shrink-0">Click to edit ▾</span>
+                <span className="shrink-0 text-zinc-500 inline-block transition-transform [[open]_&]:rotate-180">▾</span>
               </summary>
               <div className="border-t border-zinc-800 p-4 grid gap-4">
                 <PressItemForm item={item} />

@@ -32,7 +32,7 @@ export default async function AdminHeroPage() {
           </div>
         </div>
         <ImageEditor urlInputName="backgroundImageUrl" currentUrl={hero?.backgroundImage} label="Background Image" />
-        <button className="btn-primary w-fit">Save Hero</button>
+        <button className="btn-primary w-fit">Save Changes</button>
       </form>
     </div>
   );

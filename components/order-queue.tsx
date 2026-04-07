@@ -141,7 +141,21 @@ function OrderCard({ order }: { order: Order }) {
             </div>
           </div>
 
-          <form action={updateOrderAction} className="grid gap-3 md:grid-cols-[1fr_2fr_auto] md:items-end">
+          <form
+            action={updateOrderAction}
+            className="grid gap-3 md:grid-cols-[1fr_2fr_auto] md:items-end"
+            onSubmit={(e) => {
+              const form = e.currentTarget;
+              const select = form.elements.namedItem('status') as HTMLSelectElement;
+              const currentIdx = STATUSES.indexOf(order.status);
+              const newIdx = STATUSES.indexOf(select.value);
+              if (newIdx < currentIdx && select.value !== 'Cancelled') {
+                if (!confirm(`Move status backwards from "${order.status}" to "${select.value}"?`)) {
+                  e.preventDefault();
+                }
+              }
+            }}
+          >
             <input type="hidden" name="id" value={order.id} />
             <div>
               <label className="label">Update Status</label>

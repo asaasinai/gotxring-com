@@ -26,8 +26,8 @@ function ChampionForm({ champion }: { champion?: Champion }) {
         <input className="input" name="quote" required defaultValue={champion?.quote} />
       </div>
       <div>
-        <label className="label">Achievements</label>
-        <textarea className="input min-h-24" name="achievements" required defaultValue={champion?.achievements} />
+        <label className="label">Achievements <span className="font-normal normal-case text-[10px] text-zinc-500">(one per line)</span></label>
+        <textarea className="input min-h-24" name="achievements" required defaultValue={champion?.achievements} placeholder="1st Place F-Open Nationals 2023&#10;World Record Holder 1000yd" />
       </div>
       <div>
         <label className="label">Loadout <span className="font-normal normal-case text-[10px] text-zinc-500">(their Competition Machine setup)</span></label>
@@ -56,6 +56,10 @@ export default async function AdminChampionsPage() {
         <ChampionForm />
       </div>
 
+      {champions.length === 0 && (
+        <p className="text-sm text-zinc-500">No champions yet. Add your first one above.</p>
+      )}
+
       {/* Existing */}
       {champions.length > 0 && (
         <div className="grid gap-2">
@@ -64,7 +68,7 @@ export default async function AdminChampionsPage() {
             <details key={champion.id} className="rounded-lg border border-zinc-800 bg-black/30">
               <summary className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 hover:bg-zinc-900/40 select-none">
                 <span className="font-semibold text-zinc-200">{champion.name}</span>
-                <span className="text-xs text-zinc-500 shrink-0">Click to edit ▾</span>
+                <span className="shrink-0 text-zinc-500 inline-block transition-transform [[open]_&]:rotate-180">▾</span>
               </summary>
               <div className="border-t border-zinc-800 p-4 grid gap-4">
                 <ChampionForm champion={champion} />

@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 
 import { deleteBuildAction, upsertBuildAction } from '@/lib/actions';
+import { BuildCategorySelects } from '@/components/build-category-selects';
 import { BuildGalleryManager } from '@/components/build-gallery-manager';
 import { DeleteButton } from '@/components/delete-button';
 import { ImageEditor } from '@/components/image-editor';
@@ -11,34 +12,12 @@ export const dynamic = 'force-dynamic';
 
 type BuildWithImages = Prisma.BuildGetPayload<{ include: { images: true } }>;
 
-const CATEGORIES = ['Full Rifle Systems', 'Chassis Systems'];
-const SUBCATEGORIES: Record<string, string[]> = {
-  'Full Rifle Systems': ['Centerfire', 'Rimfire'],
-  'Chassis Systems': ['Remington 700 Pattern', 'Tikka T3/T3x', 'Barnard Model P', 'Other'],
-};
-
 function BuildForm({ build }: { build?: BuildWithImages }) {
-  const category = build?.category ?? '';
-  const subcategoryOptions = category ? (SUBCATEGORIES[category] ?? []) : Object.values(SUBCATEGORIES).flat();
-
   return (
     <form action={upsertBuildAction} className="grid gap-4">
       <input type="hidden" name="id" defaultValue={build?.id} />
       <div className="grid gap-3 sm:grid-cols-3">
-        <div>
-          <label className="label">Category</label>
-          <select className="input" name="category" required defaultValue={build?.category ?? ''}>
-            <option value="">— select —</option>
-            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="label">Subcategory</label>
-          <select className="input" name="subcategory" defaultValue={build?.subcategory ?? ''}>
-            <option value="">— none —</option>
-            {subcategoryOptions.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
+        <BuildCategorySelects defaultCategory={build?.category} defaultSubcategory={build?.subcategory} />
         <div>
           <label className="label">
             Sort Order <span className="font-normal normal-case text-[10px] text-zinc-500">(lower = first)</span>
@@ -105,6 +84,10 @@ export default async function AdminBuildsPage() {
         <BuildForm />
       </div>
 
+      {builds.length === 0 && (
+        <p className="text-sm text-zinc-500">No builds yet. Add your first one above.</p>
+      )}
+
       {/* Existing builds — collapsed by default */}
       {Object.entries(grouped).map(([cat, subs]) => (
         <div key={cat}>
@@ -117,7 +100,7 @@ export default async function AdminBuildsPage() {
                   <details key={build.id} className="rounded-lg border border-zinc-800 bg-black/30">
                     <summary className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 hover:bg-zinc-900/40 select-none">
                       <span className="font-semibold text-zinc-200">{build.name}</span>
-                      <span className="text-xs text-zinc-500 shrink-0">Click to edit ▾</span>
+                      <span className="shrink-0 text-zinc-500 inline-block transition-transform [[open]_&]:rotate-180">▾</span>
                     </summary>
                     <div className="border-t border-zinc-800 p-4 grid gap-4">
                       <BuildForm build={build} />

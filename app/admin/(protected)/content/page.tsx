@@ -1,4 +1,4 @@
-import { updateSettingsAction, upsertContentAction } from '@/lib/actions';
+import { upsertContentAction } from '@/lib/actions';
 import { CONTENT_KEYS, getManyContent } from '@/lib/content';
 import { prisma } from '@/lib/prisma';
 
@@ -79,28 +79,26 @@ export default async function AdminContentPage() {
           </div>
         </fieldset>
 
-        <button type="submit" className="btn-primary w-fit">Save All Text</button>
-      </form>
-
-      {/* Notification email — separate form */}
-      <div className="border-t border-zinc-800 pt-6">
-        <h2 className="mb-1 text-lg font-semibold">Notification Email</h2>
-        <p className="mb-4 text-sm text-zinc-400">New order submissions are sent to this address.</p>
-        <form action={updateSettingsAction} className="flex max-w-sm items-end gap-3">
-          <div className="flex-1">
-            <label className="label" htmlFor="notificationEmail">Email Address</label>
-            <input
-              id="notificationEmail"
-              className="input"
-              name="notificationEmail"
-              type="email"
-              required
-              defaultValue={settings?.notificationEmail ?? ''}
-            />
+        {/* Notifications */}
+        <fieldset className="section-shell rounded-lg p-5">
+          <legend className="px-1 text-xs uppercase tracking-[0.2em] text-zinc-400">Notifications</legend>
+          <div className="mt-4">
+            <label className="grid gap-1.5 max-w-sm">
+              <span className="label">Order Notification Email</span>
+              <input
+                name="notificationEmail"
+                className="input"
+                type="email"
+                defaultValue={settings?.notificationEmail ?? ''}
+                placeholder="you@example.com"
+              />
+              <span className="text-[11px] text-zinc-500">New order submissions are sent to this address.</span>
+            </label>
           </div>
-          <button className="btn-primary shrink-0">Save</button>
-        </form>
-      </div>
+        </fieldset>
+
+        <button type="submit" className="btn-primary w-fit">Save All Settings</button>
+      </form>
     </div>
   );
 }
