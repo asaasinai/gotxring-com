@@ -11,12 +11,15 @@ model Build {
   id             String   @id @default(cuid())
   name           String
   description    String
-  discipline     String
-  chassisType    String
+  category       String   @default("")
+  subcategory    String   @default("")
+  discipline     String   @default("")
+  chassisType    String   @default("")
   caliber        String
   imageUrl       String?
   specifications Json
   featured       Boolean  @default(false)
+  sortOrder      Int      @default(0)
   createdAt      DateTime @default(now())
 }
 

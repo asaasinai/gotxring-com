@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { ChampionsClient } from '@/components/champions-client';
+import { ProductCatalog } from '@/components/product-catalog';
 import { prisma } from '@/lib/prisma';
 import { formatDate } from '@/lib/utils';
 
@@ -17,7 +18,7 @@ const defaultHero = {
 
 export default async function HomePage() {
   const [builds, champions, posts, press, hero] = await Promise.all([
-    prisma.build.findMany({ orderBy: { createdAt: 'desc' }, take: 3 }),
+    prisma.build.findMany({ orderBy: [{ category: 'asc' }, { subcategory: 'asc' }, { sortOrder: 'asc' }, { createdAt: 'asc' }] }),
     prisma.champion.findMany({ where: { featured: true }, orderBy: { createdAt: 'desc' }, take: 4 }),
     prisma.blogPost.findMany({ where: { published: true }, orderBy: { publishedAt: 'desc' }, take: 3 }),
     prisma.pressItem.findMany({ orderBy: { publishedAt: 'desc' }, take: 3 }),
@@ -26,8 +27,25 @@ export default async function HomePage() {
 
   const heroContent = hero ?? defaultHero;
 
+  // Group builds into category → subcategory hierarchy
+  const categoryMap = new Map<string, Map<string, typeof builds>>();
+  for (const build of builds) {
+    const cat = build.category || 'Other';
+    const sub = build.subcategory || '';
+    if (!categoryMap.has(cat)) categoryMap.set(cat, new Map());
+    const subMap = categoryMap.get(cat)!;
+    if (!subMap.has(sub)) subMap.set(sub, []);
+    subMap.get(sub)!.push(build);
+  }
+
+  const grouped = Array.from(categoryMap.entries()).map(([category, subMap]) => ({
+    category,
+    subcategories: Array.from(subMap.entries()).map(([name, items]) => ({ name, builds: items }))
+  }));
+
   return (
     <div>
+      {/* ── Hero ── */}
       <section
         className="border-b border-zinc-800 bg-gradient-to-br from-black to-[#111111]"
         style={{
@@ -46,35 +64,25 @@ export default async function HomePage() {
             <Link className="btn-primary" href={heroContent.ctaButtonUrl}>
               {heroContent.ctaButtonText}
             </Link>
-            <Link className="btn-muted" href="/builds">
-              Explore Builds
+            <Link className="btn-muted" href="#systems">
+              Explore Systems
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-14 md:px-8">
-        <div className="flex items-end justify-between">
-          <h2 className="text-2xl font-bold uppercase tracking-[0.12em]">Builds Gallery</h2>
-          <Link href="/builds" className="text-sm text-zinc-300 hover:text-white">
-            View all builds
-          </Link>
+      {/* ── Product Catalog ── */}
+      <section id="systems" className="mx-auto w-full max-w-7xl px-4 py-16 md:px-8">
+        <div className="mb-10 flex items-end justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">What We Build</p>
+            <h2 className="mt-1 text-2xl font-bold uppercase tracking-[0.12em]">Our Systems</h2>
+          </div>
         </div>
-        <div className="grid gap-5 md:grid-cols-3">
-          {builds.map((build) => (
-            <article key={build.id} className="section-shell rounded-lg p-4">
-              <div
-                className="mb-3 h-40 rounded bg-zinc-900"
-                style={{ backgroundImage: `url(${build.imageUrl ?? ''})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-              />
-              <p className="text-xs uppercase tracking-[0.16em] text-[#C8102E]">{build.discipline}</p>
-              <h3 className="mt-1 text-lg font-semibold">{build.name}</h3>
-              <p className="text-sm text-zinc-300">{build.caliber}</p>
-            </article>
-          ))}
-        </div>
+        <ProductCatalog grouped={grouped} />
       </section>
 
+      {/* ── Champions Circle ── */}
       <section className="border-y border-zinc-800 bg-[#111111]/70">
         <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-14 md:px-8">
           <h2 className="text-2xl font-bold uppercase tracking-[0.12em]">Champions Circle</h2>
@@ -82,6 +90,7 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── Blog Preview ── */}
       <section className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-14 md:px-8">
         <div className="flex items-end justify-between">
           <h2 className="text-2xl font-bold uppercase tracking-[0.12em]">Blog Preview</h2>
@@ -103,6 +112,7 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── Press ── */}
       <section className="border-y border-zinc-800 bg-[#111111]/70">
         <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-14 md:px-8">
           <h2 className="text-2xl font-bold uppercase tracking-[0.12em]">Press</h2>
@@ -121,9 +131,10 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── Order CTA ── */}
       <section className="mx-auto w-full max-w-7xl px-4 py-16 md:px-8">
         <div className="section-shell rounded-xl p-8 text-center">
-          <h2 className="text-3xl font-bold uppercase">Order Your Build</h2>
+          <h2 className="text-3xl font-bold uppercase">Configure Your Build</h2>
           <p className="mx-auto mt-3 max-w-2xl text-zinc-300">
             Tell us your mission profile and we will design a precision system around your performance goals.
           </p>

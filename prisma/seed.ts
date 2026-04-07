@@ -13,94 +13,140 @@ const defaultHero = {
 };
 
 const builds: Prisma.BuildCreateInput[] = [
+  // ── Full Rifle Systems / Centerfire ──────────────────────────────────────
   {
-    name: 'Titanium F-Class Dominator',
-    description: 'Competition-tuned F-Class platform optimized for repeatable long-range precision.',
-    discipline: 'F-Class',
-    chassisType: 'McMillan A5',
-    caliber: '6.5 Creedmoor',
+    name: 'Universal Match Rifle System (UMR)',
+    description: 'Competition Machine\'s flagship centerfire platform. The UMR is purpose-built for F-Class and long-range precision competition, delivering sub-MOA accuracy with consistent barrel-to-barrel repeatability.',
+    category: 'Full Rifle Systems',
+    subcategory: 'Centerfire',
+    discipline: 'F-Class / Long Range',
+    chassisType: 'Custom Competition Stock',
+    caliber: '6.5 Creedmoor / 6mm Dasher / .284',
     imageUrl: 'https://images.unsplash.com/photo-1561994183-94c5f4f86f44?auto=format&fit=crop&w=1400&q=80',
     featured: true,
+    sortOrder: 1,
     specifications: {
+      action: 'Custom billet receiver',
+      barrel: 'Match-grade stainless, customer specified',
       trigger: 'Jewell HVR',
-      stock: 'McMillan A5',
-      optic: 'Nightforce ATACR',
-      barrel: '26" match barrel'
+      stock: 'Custom competition stock',
+      available_calibers: '6.5 Creedmoor, 6mm Dasher, .284 Win'
     }
   },
   {
-    name: 'PRS Impact Rig',
-    description: 'Fast, rugged PRS build with recoil management and rapid positional stability.',
-    discipline: 'PRS',
-    chassisType: 'KRG Bravo',
-    caliber: '6mm Dasher',
+    name: 'T3 Competition Rifle',
+    description: 'Built on the Tikka T3x action, the T3 Competition Rifle is Competition Machine\'s precision PRS platform. Tuned from the factory trigger up, it delivers consistent performance in rapid positional shooting.',
+    category: 'Full Rifle Systems',
+    subcategory: 'Centerfire',
+    discipline: 'PRS / Precision Rifle',
+    chassisType: 'KRG / MDT Compatible',
+    caliber: '6mm Dasher / 6.5 Creedmoor',
     imageUrl: 'https://images.unsplash.com/photo-1550935112-2d0f9f79c8f8?auto=format&fit=crop&w=1400&q=80',
     featured: true,
+    sortOrder: 2,
     specifications: {
-      trigger: 'TriggerTech Diamond',
-      stock: 'KRG Bravo',
-      optic: 'Vortex Razor HD',
-      muzzle: 'Match brake'
+      action: 'Tikka T3x (tuned)',
+      barrel: 'Match-grade, 24"–26"',
+      trigger: 'Factory tuned or upgraded',
+      chassis: 'KRG Bravo or customer choice',
+      available_calibers: '6mm Dasher, 6.5 Creedmoor, others on request'
     }
   },
+  // ── Full Rifle Systems / Rimfire ─────────────────────────────────────────
   {
-    name: 'Benchrest Zero Drift',
-    description: 'Purpose-built benchrest rifle focused on minimal variance and tiny groups.',
-    discipline: 'Benchrest',
-    chassisType: 'McMillan Benchrest',
-    caliber: '6mm PPC',
+    name: '2500x Rifle System',
+    description: 'Competition Machine\'s dedicated rimfire competition platform. The 2500x is built for precision rimfire disciplines including the NRL22 and PRS Rimfire series — a proper training tool and match winner.',
+    category: 'Full Rifle Systems',
+    subcategory: 'Rimfire',
+    discipline: 'NRL22 / PRS Rimfire',
+    chassisType: 'Custom rimfire chassis',
+    caliber: '.22 LR',
     imageUrl: 'https://images.unsplash.com/photo-1551830820-330a71b99659?auto=format&fit=crop&w=1400&q=80',
-    featured: true,
-    specifications: {
-      trigger: 'Jewell BR',
-      stock: 'McMillan Benchrest',
-      optic: 'March 8-80x56',
-      tuner: 'Precision harmonic tuner'
-    }
-  },
-  {
-    name: 'Long Range Hunter Elite',
-    description: 'High-energy hunting package balancing field portability and downrange authority.',
-    discipline: 'Long Range Hunter',
-    chassisType: 'Carbon hybrid chassis',
-    caliber: '300 Win Mag',
-    imageUrl: 'https://images.unsplash.com/photo-1544551763-7ef420c8f4f5?auto=format&fit=crop&w=1400&q=80',
     featured: false,
+    sortOrder: 1,
     specifications: {
-      barrel: '24" fluted stainless',
-      stock: 'Carbon hybrid',
-      optic: 'Long-range hunting optic',
-      weight: '8.9 lbs'
+      caliber: '.22 LR',
+      action: 'Custom billet rimfire receiver',
+      barrel: 'Match-grade rimfire barrel',
+      trigger: 'Competition rimfire trigger',
+      use_case: 'Off-season training, NRL22, PRS Rimfire'
     }
   },
   {
-    name: 'Urban Tactical Sentinel',
-    description: 'Duty-ready tactical setup configured for consistency under stress.',
-    discipline: 'Tactical',
-    chassisType: 'Magpul PRS Gen3',
-    caliber: '.308',
-    imageUrl: 'https://images.unsplash.com/photo-1518544889280-7f2e7a2f44f5?auto=format&fit=crop&w=1400&q=80',
-    featured: false,
-    specifications: {
-      trigger: 'Geissele Super 700',
-      stock: 'Magpul PRS Gen3',
-      optic: 'LPVO tactical optic',
-      rail: 'Full-length MLOK'
-    }
-  },
-  {
-    name: 'Sporting Ridge Runner',
-    description: 'Refined sporting rifle for dependable performance with elegant handling.',
-    discipline: 'Sporting',
-    chassisType: 'Classic composite stock',
-    caliber: '.270',
+    name: 'Universal Match Rimfire Rifle System (UMRR)',
+    description: 'The rimfire counterpart to the UMR. The UMRR brings the same match-grade attention to detail to .22 LR competition, offering shooters a purpose-built rimfire system for serious competition use.',
+    category: 'Full Rifle Systems',
+    subcategory: 'Rimfire',
+    discipline: 'Rimfire Benchrest / NRL22',
+    chassisType: 'Custom match stock',
+    caliber: '.22 LR',
     imageUrl: 'https://images.unsplash.com/photo-1455103493930-a116f655b6c5?auto=format&fit=crop&w=1400&q=80',
     featured: false,
+    sortOrder: 2,
     specifications: {
-      barrel: '22" precision contour',
-      stock: 'Classic composite',
-      optic: 'Variable hunting scope',
-      finish: 'Cerakote graphite black'
+      caliber: '.22 LR',
+      action: 'Match rimfire action',
+      barrel: 'Premium match rimfire barrel',
+      stock: 'Custom competition stock',
+      use_case: 'Rimfire benchrest, precision rimfire competition'
+    }
+  },
+  // ── Chassis Systems ───────────────────────────────────────────────────────
+  {
+    name: 'Remington 700 Pattern Chassis',
+    description: 'Competition Machine\'s precision chassis built around the Remington 700 footprint. Compatible with a wide range of actions, this chassis delivers a rigid, repeatable bedding solution for serious competitors.',
+    category: 'Chassis Systems',
+    subcategory: '',
+    discipline: 'F-Class / PRS / Benchrest',
+    chassisType: 'Billet aluminum',
+    caliber: 'Remington 700 SA / LA',
+    imageUrl: 'https://images.unsplash.com/photo-1518544889280-7f2e7a2f44f5?auto=format&fit=crop&w=1400&q=80',
+    featured: true,
+    sortOrder: 1,
+    specifications: {
+      inlet: 'Remington 700 Short Action / Long Action',
+      material: 'Billet 6061-T6 aluminum',
+      finish: 'Cerakote, customer specified',
+      compatibility: 'Most Rem 700 pattern actions',
+      available_in: 'Standard and thumbhole configurations'
+    }
+  },
+  {
+    name: 'Tikka T3 Chassis',
+    description: 'Precision chassis system inletted specifically for the Tikka T3/T3x action. Pairs with the T3 Competition Rifle build or is available standalone for shooters wanting to upgrade their existing T3.',
+    category: 'Chassis Systems',
+    subcategory: '',
+    discipline: 'PRS / Precision Rifle',
+    chassisType: 'Billet aluminum',
+    caliber: 'Tikka T3 / T3x',
+    imageUrl: 'https://images.unsplash.com/photo-1544551763-7ef420c8f4f5?auto=format&fit=crop&w=1400&q=80',
+    featured: false,
+    sortOrder: 2,
+    specifications: {
+      inlet: 'Tikka T3 / T3x',
+      material: 'Billet 6061-T6 aluminum',
+      finish: 'Cerakote, customer specified',
+      compatibility: 'Tikka T3, T3x (all barrel profiles)',
+      available_in: 'Standard and thumbhole configurations'
+    }
+  },
+  {
+    name: 'Barnard Model P Chassis',
+    description: 'Chassis system built around the Barnard Model P action — one of the most accurate production actions available. Designed for benchrest and long-range F-Class competition shooters who demand maximum precision.',
+    category: 'Chassis Systems',
+    subcategory: '',
+    discipline: 'Benchrest / F-Class',
+    chassisType: 'Billet aluminum',
+    caliber: 'Barnard Model P',
+    imageUrl: 'https://images.unsplash.com/photo-1561994183-94c5f4f86f44?auto=format&fit=crop&w=1400&q=80',
+    featured: false,
+    sortOrder: 3,
+    specifications: {
+      inlet: 'Barnard Model P',
+      material: 'Billet 6061-T6 aluminum',
+      finish: 'Cerakote, customer specified',
+      use_case: 'Benchrest, F-Class long range',
+      compatibility: 'Barnard Model P (single shot and repeater)'
     }
   }
 ];

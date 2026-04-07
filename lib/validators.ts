@@ -2,13 +2,16 @@ import { z } from 'zod';
 
 export const buildSchema = z.object({
   name: z.string().min(2),
-  description: z.string().min(10),
-  discipline: z.string().min(2),
-  chassisType: z.string().min(2),
+  description: z.string().min(2),
+  category: z.string().min(2),
+  subcategory: z.string().optional().or(z.literal('')),
+  discipline: z.string().optional().or(z.literal('')),
+  chassisType: z.string().optional().or(z.literal('')),
   caliber: z.string().min(1),
   imageUrl: z.string().url().optional().or(z.literal('')),
   specificationsText: z.string().min(2),
-  featured: z.boolean().optional()
+  featured: z.boolean().optional(),
+  sortOrder: z.number().optional()
 });
 
 export const championSchema = z.object({

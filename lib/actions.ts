@@ -67,12 +67,15 @@ export async function upsertBuildAction(formData: FormData): Promise<void> {
   const parsed = buildSchema.parse({
     name: asString(formData.get('name')),
     description: asString(formData.get('description')),
+    category: asString(formData.get('category')),
+    subcategory: asString(formData.get('subcategory')),
     discipline: asString(formData.get('discipline')),
     chassisType: asString(formData.get('chassisType')),
     caliber: asString(formData.get('caliber')),
     imageUrl,
     specificationsText: asString(formData.get('specificationsText')),
-    featured: asBoolean(formData.get('featured'))
+    featured: asBoolean(formData.get('featured')),
+    sortOrder: parseInt(asString(formData.get('sortOrder')) || '0', 10)
   });
 
   let specifications: Prisma.InputJsonValue;
@@ -85,12 +88,15 @@ export async function upsertBuildAction(formData: FormData): Promise<void> {
   const data = {
     name: parsed.name,
     description: parsed.description,
-    discipline: parsed.discipline,
-    chassisType: parsed.chassisType,
+    category: parsed.category,
+    subcategory: parsed.subcategory || '',
+    discipline: parsed.discipline || '',
+    chassisType: parsed.chassisType || '',
     caliber: parsed.caliber,
     imageUrl: parsed.imageUrl || null,
     specifications,
-    featured: parsed.featured ?? false
+    featured: parsed.featured ?? false,
+    sortOrder: parsed.sortOrder ?? 0
   };
 
   if (id) {
