@@ -6,7 +6,33 @@ export const metadata = {
   title: 'Order | GotXRing'
 };
 
-export default function OrderPage() {
+type Props = {
+  searchParams: Record<string, string | string[] | undefined>;
+};
+
+function str(v: string | string[] | undefined): string {
+  return typeof v === 'string' ? v : '';
+}
+
+export default function OrderPage({ searchParams }: Props) {
+  const rawCategory = str(searchParams.category);
+  const orderType: 'Chassis System' | 'Full Rifle System' | '' =
+    rawCategory.startsWith('Full') ? 'Full Rifle System' :
+    rawCategory.startsWith('Chassis') ? 'Chassis System' : '';
+
+  const selectedSystem = str(searchParams.system);
+
+  // Infer subcategory: prefer explicit param, otherwise detect from system name
+  const rawSub = str(searchParams.subcategory);
+  const subcategory: 'Centerfire' | 'Rimfire' | '' =
+    rawSub === 'Centerfire' ? 'Centerfire' :
+    rawSub === 'Rimfire' ? 'Rimfire' :
+    orderType === 'Full Rifle System' && selectedSystem
+      ? (selectedSystem.toLowerCase().includes('rimfire') || selectedSystem.includes('2500x') ? 'Rimfire' : 'Centerfire')
+      : '';
+
+  const initialStep = orderType && selectedSystem ? 2 : orderType ? 1 : 0;
+
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-12 md:px-8">
       <h1 className="text-4xl font-bold uppercase">Order</h1>
@@ -15,7 +41,14 @@ export default function OrderPage() {
       </p>
       <div className="mt-8">
         <Suspense>
-          <OrderForm />
+          <OrderForm
+            initialOrderType={orderType}
+            initialSystem={selectedSystem}
+            initialSubcategory={subcategory}
+            initialCaliber={str(searchParams.caliber)}
+            initialDiscipline={str(searchParams.discipline)}
+            initialStep={initialStep}
+          />
         </Suspense>
       </div>
     </div>

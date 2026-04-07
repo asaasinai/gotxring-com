@@ -19,7 +19,9 @@ export function SiteFooter() {
             </div>
             <div>
               <p className="mb-1 text-[0.65rem] uppercase tracking-[0.18em] text-zinc-500">Phone</p>
-              <a href="tel:9286490742" className="text-zinc-300 transition hover:text-white">928-649-0742</a>
+              <a href="tel:9286490742" className="text-base font-semibold text-white transition hover:text-[#C8102E] md:text-sm md:font-normal md:text-zinc-300">
+                928-649-0742
+              </a>
             </div>
           </div>
         </div>

@@ -399,7 +399,7 @@ export async function deleteOrderAction(formData: FormData): Promise<void> {
   revalidatePath('/admin/orders');
 }
 
-export async function upsertOrderAction(formData: FormData): Promise<{ success?: string; error?: string }> {
+export async function upsertOrderAction(formData: FormData): Promise<{ success?: string; error?: string; orderId?: string }> {
   const parsed = orderSchema.safeParse({
     orderType: asString(formData.get('orderType')),
     selectedSystem: asString(formData.get('selectedSystem')),
@@ -450,7 +450,10 @@ export async function upsertOrderAction(formData: FormData): Promise<{ success?:
   await sendOrderEmails(order);
   revalidatePath('/admin/orders');
 
-  return { success: "Your order has been received. We'll be in touch within 24 hours with pricing and delivery timeline." };
+  return {
+    success: "Your order has been received. We'll be in touch within 24 hours with pricing and delivery timeline.",
+    orderId: order.id,
+  };
 }
 
 export async function upsertContentAction(formData: FormData): Promise<void> {

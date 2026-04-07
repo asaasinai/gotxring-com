@@ -26,29 +26,36 @@ export default async function HomePage() {
   ]);
 
   const heroContent = hero ?? defaultHero;
+  const hasBgImage = !!heroContent.backgroundImage;
 
   return (
     <div>
       {/* ── Hero ── */}
       <section
-        className="border-b border-zinc-800 bg-gradient-to-br from-black to-[#111111]"
-        style={{
-          backgroundImage: heroContent.backgroundImage
-            ? `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.78)), url(${heroContent.backgroundImage})`
-            : undefined,
+        className="relative overflow-hidden border-b border-zinc-800"
+        style={hasBgImage ? {
+          backgroundImage: `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.78)), url(${heroContent.backgroundImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center'
-        }}
+        } : undefined}
       >
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-24 md:px-8">
-          <p className="text-xs uppercase tracking-[0.3em] text-zinc-300">Competition Machine Inc</p>
+        {/* Atmospheric red glow (no-image state) */}
+        {!hasBgImage && (
+          <>
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black via-[#0d0d0d] to-[#111111]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_80%_20%,rgba(200,16,46,0.22),transparent)]" />
+            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#0a0a0a] to-transparent" />
+          </>
+        )}
+        <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-28 md:py-36 md:px-8">
+          <p className="text-xs uppercase tracking-[0.3em] text-zinc-400">Competition Machine Inc</p>
           <h1 className="max-w-4xl text-4xl font-bold uppercase leading-tight md:text-6xl">{heroContent.headline}</h1>
-          <p className="max-w-2xl text-zinc-200">{heroContent.subheadline}</p>
-          <div className="flex gap-3">
-            <Link className="btn-primary" href={heroContent.ctaButtonUrl}>
+          <p className="max-w-2xl text-zinc-300">{heroContent.subheadline}</p>
+          <div className="flex flex-wrap gap-3">
+            <Link className="btn-primary px-6 py-3 text-base" href={heroContent.ctaButtonUrl}>
               {heroContent.ctaButtonText}
             </Link>
-            <Link className="btn-muted" href="#systems">
+            <Link className="btn-muted px-6 py-3 text-base" href="#systems">
               Explore Systems
             </Link>
           </div>
@@ -77,9 +84,9 @@ export default async function HomePage() {
       {/* ── Blog Preview ── */}
       <section className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-14 md:px-8">
         <div className="flex items-end justify-between">
-          <h2 className="text-2xl font-bold uppercase tracking-[0.12em]">Blog Preview</h2>
-          <Link href="/blog" className="text-sm text-zinc-300 hover:text-white">
-            Read all
+          <h2 className="text-2xl font-bold uppercase tracking-[0.12em]">From the Blog</h2>
+          <Link href="/blog" className="text-sm text-zinc-400 hover:text-white transition">
+            Read all →
           </Link>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
@@ -102,13 +109,16 @@ export default async function HomePage() {
           <h2 className="text-2xl font-bold uppercase tracking-[0.12em]">Press</h2>
           <div className="grid gap-5 md:grid-cols-3">
             {press.map((item) => (
-              <article key={item.id} className="section-shell rounded-lg p-5">
-                <p className="text-xs uppercase tracking-[0.16em] text-zinc-400">{item.publication}</p>
-                <h3 className="mt-2 text-lg font-semibold">{item.title}</h3>
-                <p className="mt-1 text-sm text-zinc-300">{formatDate(item.publishedAt)}</p>
-                <a href={item.url} target="_blank" rel="noreferrer" className="mt-4 inline-block text-sm text-white underline underline-offset-4">
-                  Read source
-                </a>
+              <article key={item.id} className="section-shell rounded-lg overflow-hidden flex">
+                <div className="w-1 shrink-0 bg-[#C8102E]" />
+                <div className="p-5">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-white">{item.publication}</p>
+                  <h3 className="mt-2 text-base font-semibold text-zinc-200 leading-snug">{item.title}</h3>
+                  <p className="mt-1 text-xs text-zinc-500">{formatDate(item.publishedAt)}</p>
+                  <a href={item.url} target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm text-[#C8102E] hover:text-red-400 underline underline-offset-4 transition">
+                    Read source ↗
+                  </a>
+                </div>
               </article>
             ))}
           </div>
@@ -116,33 +126,40 @@ export default async function HomePage() {
       </section>
 
       {/* ── Order CTA ── */}
-      <section className="mx-auto w-full max-w-7xl px-4 py-16 md:px-8">
-        <div className="section-shell rounded-xl p-8 text-center">
-          <h2 className="text-3xl font-bold uppercase">Configure Your Build</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-zinc-300">
+      <section className="relative overflow-hidden border-b border-zinc-800">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_50%_50%,rgba(200,16,46,0.13),transparent)]" />
+        <div className="relative mx-auto w-full max-w-7xl px-4 py-20 md:px-8 text-center">
+          <p className="text-xs uppercase tracking-[0.3em] text-[#C8102E]">Ready to Build</p>
+          <h2 className="mt-2 text-3xl font-bold uppercase md:text-4xl">Configure Your Build</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-zinc-300">
             Tell us your mission profile and we will design a precision system around your performance goals.
           </p>
-          <Link href="/order" className="btn-primary mt-6 inline-block">
-            Begin Order
+          <Link href="/order" className="btn-primary mt-6 inline-block px-8 py-3 text-base">
+            Begin Order →
           </Link>
+          <p className="mt-4 text-xs text-zinc-500">No payment required · Response within 24 hours</p>
         </div>
       </section>
 
-      {/* ── Facebook Feed ── */}
+      {/* ── Follow ── */}
       <section className="border-t border-zinc-800 bg-[#111111]/70">
         <div className="mx-auto w-full max-w-7xl px-4 py-14 md:px-8">
-          <h2 className="mb-8 text-2xl font-bold uppercase tracking-[0.12em]">Latest from Facebook</h2>
-          <div className="flex justify-center">
-            <iframe
-              src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fprofile.php%3Fid%3D100057410442994&tabs=timeline&width=500&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false"
-              width="500"
-              height="600"
-              style={{ border: 'none', overflow: 'hidden', maxWidth: '100%', display: 'block' }}
-              scrolling="no"
-              frameBorder="0"
-              allowFullScreen
-              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-            />
+          <div className="flex flex-col items-center gap-4 text-center">
+            <h2 className="text-2xl font-bold uppercase tracking-[0.12em]">Follow the Build</h2>
+            <p className="max-w-lg text-zinc-400 text-sm">
+              Latest builds, competition results, and behind-the-scenes content from the shop.
+            </p>
+            <a
+              href="https://www.facebook.com/profile.php?id=100057410442994"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-muted mt-2 inline-flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.884v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+              </svg>
+              Follow on Facebook
+            </a>
           </div>
         </div>
       </section>

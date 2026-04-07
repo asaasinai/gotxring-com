@@ -146,7 +146,7 @@ function BuildModal({ build, onClose }: { build: Build; onClose: () => void }) {
               </div>
             )}
             <Link
-              href={`/order?system=${encodeURIComponent(build.name)}&category=${encodeURIComponent(build.category)}`}
+              href={`/order?system=${encodeURIComponent(build.name)}&category=${encodeURIComponent(build.category)}${build.subcategory ? `&subcategory=${encodeURIComponent(build.subcategory)}` : ''}`}
               className="btn-primary mt-auto text-center text-sm"
               onClick={onClose}
             >
