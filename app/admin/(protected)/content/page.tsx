@@ -1,5 +1,6 @@
 import { upsertContentAction } from '@/lib/actions';
 import { CONTENT_KEYS, getManyContent } from '@/lib/content';
+import { ImageEditor } from '@/components/image-editor';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -94,6 +95,20 @@ export default async function AdminContentPage() {
               />
               <span className="text-[11px] text-zinc-500">New order submissions are sent to this address.</span>
             </label>
+          </div>
+        </fieldset>
+
+        {/* About Page */}
+        <fieldset className="section-shell rounded-lg p-5">
+          <legend className="px-1 text-xs uppercase tracking-[0.2em] text-zinc-400">About Page</legend>
+          <div className="mt-4 grid gap-6">
+            <ImageEditor urlInputName="about_featured_image" currentUrl={content.about_featured_image || undefined} label="Featured Image" />
+            <label className="grid gap-1.5">
+              <span className="label">Body Text</span>
+              <textarea name="about_body" rows={10} className="input resize-none" defaultValue={content.about_body || CONTENT_KEYS.about_body} />
+            </label>
+            <ImageEditor urlInputName="about_signature_image" currentUrl={content.about_signature_image || undefined} label="Signature Image (—Gary)" />
+            <p className="text-[11px] text-zinc-500">If no signature image is uploaded, the page will render "—Gary" in a script font as a fallback.</p>
           </div>
         </fieldset>
 

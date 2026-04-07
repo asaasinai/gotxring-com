@@ -490,6 +490,7 @@ export async function upsertContentAction(formData: FormData): Promise<void> {
   }
   revalidatePath('/builds');
   revalidatePath('/contact');
+  revalidatePath('/about');
   revalidatePath('/admin/content');
   redirect('/admin/content?saved=1');
 }

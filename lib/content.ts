@@ -11,6 +11,15 @@ export const CONTENT_KEYS = {
   contact_email: '',
   lead_time: '8–10 weeks',
   order_phone: '928-649-0742',
+  about_featured_image: '',
+  about_body: `I started Competition Machine Inc out of a simple belief: every shooter deserves a rifle built to the same standard as the ones winning national titles.
+
+For over two decades, I've worked alongside competitive shooters at every level—from grassroots benchrest clubs to the national PRS circuit. That experience shaped how we build: no shortcuts, no compromises, and every component selected for a reason.
+
+Whether you're a first-time custom buyer or a seasoned competitor, we take the time to understand your discipline, your style, and your goals. Then we build accordingly.
+
+If you're ready to shoot at the top of your class, I'd like to build the rifle that gets you there.`,
+  about_signature_image: '',
 } as const;
 
 export type ContentKey = keyof typeof CONTENT_KEYS;
