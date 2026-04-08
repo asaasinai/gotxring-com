@@ -11,6 +11,23 @@ function askLink(img: GalleryItem) {
   return `/contact?${params.toString()}`;
 }
 
+async function downloadImage(url: string, caption: string) {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = objectUrl;
+    const ext = blob.type === 'image/png' ? 'png' : 'jpg';
+    a.download = caption ? `${caption.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.${ext}` : `build.${ext}`;
+    a.click();
+    URL.revokeObjectURL(objectUrl);
+  } catch {
+    // Fallback: open in new tab
+    window.open(url, '_blank');
+  }
+}
+
 export function GalleryGrid({ images }: { images: GalleryItem[] }) {
   const [active, setActive] = useState<GalleryItem | null>(null);
 
@@ -53,18 +70,30 @@ export function GalleryGrid({ images }: { images: GalleryItem[] }) {
                 loading="lazy"
               />
             </button>
-            {/* Hover overlay — caption + ask button */}
+            {/* Hover overlay — caption + buttons */}
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent px-2 pb-2 pt-6 opacity-0 transition group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto">
               {img.caption && (
                 <p className="mb-1.5 text-xs text-white">{img.caption}</p>
               )}
-              <Link
-                href={askLink(img)}
-                onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1 rounded bg-[#FF1A35] px-2 py-1 text-[11px] font-semibold text-white hover:bg-red-500 transition"
-              >
-                Ask about this system →
-              </Link>
+              <div className="flex flex-wrap gap-1.5">
+                <Link
+                  href={askLink(img)}
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-1 rounded bg-[#FF1A35] px-2 py-1 text-[11px] font-semibold text-white hover:bg-red-500 transition"
+                >
+                  Ask about this →
+                </Link>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); downloadImage(img.url, img.caption); }}
+                  className="inline-flex items-center gap-1 rounded bg-zinc-700 px-2 py-1 text-[11px] font-semibold text-white hover:bg-zinc-500 transition"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3 w-3">
+                    <path d="M12 3v13m0 0l-4-4m4 4l4-4M3 21h18" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  Save
+                </button>
+              </div>
             </div>
           </div>
         ))}
@@ -112,13 +141,25 @@ export function GalleryGrid({ images }: { images: GalleryItem[] }) {
                 {active.caption && (
                   <p className="text-center text-base text-zinc-200">{active.caption}</p>
                 )}
-                <Link
-                  href={askLink(active)}
-                  className="inline-flex items-center gap-2 rounded-lg bg-[#FF1A35] px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-500 transition"
-                  onClick={() => setActive(null)}
-                >
-                  Ask about this system →
-                </Link>
+                <div className="flex flex-wrap justify-center gap-3">
+                  <Link
+                    href={askLink(active)}
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#FF1A35] px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-500 transition"
+                    onClick={() => setActive(null)}
+                  >
+                    Ask about this system →
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => downloadImage(active.url, active.caption)}
+                    className="inline-flex items-center gap-2 rounded-lg bg-zinc-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-500 transition"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4">
+                      <path d="M12 3v13m0 0l-4-4m4 4l4-4M3 21h18" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Download Image
+                  </button>
+                </div>
               </div>
             </div>
 
