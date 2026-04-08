@@ -23,7 +23,7 @@ export default async function HomePage() {
   const [builds, champions, posts, press, hero, videos, gallery] = await Promise.all([
     prisma.build.findMany({ orderBy: [{ category: 'asc' }, { subcategory: 'asc' }, { sortOrder: 'asc' }, { createdAt: 'asc' }], include: { images: { orderBy: { sortOrder: 'asc' } } } }),
     prisma.champion.findMany({ where: { featured: true }, orderBy: { createdAt: 'desc' }, take: 4 }),
-    prisma.blogPost.findMany({ where: { published: true }, orderBy: { publishedAt: 'desc' }, take: 3 }),
+    prisma.blogPost.findMany({ where: { published: true }, orderBy: { publishedAt: 'desc' }, take: 3, include: { images: { orderBy: { sortOrder: 'asc' }, take: 1 } } }),
     prisma.pressItem.findMany({ orderBy: { publishedAt: 'desc' }, take: 3 }),
     prisma.hero.findFirst({ orderBy: { updatedAt: 'desc' } }),
     getYoutubeVideos(),
@@ -153,16 +153,27 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
-          {posts.map((post) => (
-            <article key={post.id} className="section-shell rounded-lg p-5">
-              <p className="text-xs uppercase tracking-[0.16em] text-[#FF1A35]">{post.category}</p>
-              <h3 className="mt-1 text-lg font-semibold">{post.title}</h3>
-              <p className="mt-2 text-sm text-zinc-300">{post.excerpt}</p>
-              <Link href={`/blog/${post.slug}`} className="mt-4 inline-block text-sm text-white underline underline-offset-4">
-                Continue
-              </Link>
-            </article>
-          ))}
+          {posts.map((post) => {
+            const featuredImage = post.images[0];
+            return (
+              <article key={post.id} className="section-shell overflow-hidden rounded-lg">
+                {featuredImage && (
+                  <Link href={`/blog/${post.slug}`}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={featuredImage.url} alt={post.title} className="h-44 w-full object-cover" />
+                  </Link>
+                )}
+                <div className="p-5">
+                  <p className="text-xs uppercase tracking-[0.16em] text-[#FF1A35]">{post.category}</p>
+                  <h3 className="mt-1 text-lg font-semibold">{post.title}</h3>
+                  {post.excerpt && <p className="mt-2 text-sm text-zinc-300">{post.excerpt}</p>}
+                  <Link href={`/blog/${post.slug}`} className="mt-4 inline-block text-sm text-white underline underline-offset-4">
+                    Continue
+                  </Link>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 
