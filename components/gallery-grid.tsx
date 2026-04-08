@@ -6,9 +6,7 @@ import Link from 'next/link';
 type GalleryItem = { id: string; url: string; caption: string };
 
 function askLink(img: GalleryItem) {
-  const params = new URLSearchParams({ imageUrl: img.url });
-  if (img.caption) params.set('caption', img.caption);
-  return `/contact?${params.toString()}`;
+  return `/contact?ref=${img.id}`;
 }
 
 async function downloadImage(url: string, caption: string) {

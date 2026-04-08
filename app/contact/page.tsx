@@ -1,4 +1,5 @@
 import { getManyContent } from '@/lib/content';
+import { prisma } from '@/lib/prisma';
 import { ContactForm } from './contact-form';
 
 export const metadata = {
@@ -15,8 +16,10 @@ function str(v: string | string[] | undefined) {
 export default async function ContactPage({ searchParams }: Props) {
   const content = await getManyContent(['contact_title', 'contact_subtext', 'contact_address', 'contact_phone', 'contact_email']);
 
-  const imageUrl = str(searchParams.imageUrl);
-  const caption = str(searchParams.caption);
+  const ref = str(searchParams.ref);
+  const galleryImage = ref ? await prisma.galleryImage.findUnique({ where: { id: ref } }) : null;
+  const imageUrl = galleryImage?.url ?? '';
+  const caption = galleryImage?.caption ?? '';
 
   return (
     <div>
