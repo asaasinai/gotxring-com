@@ -6,8 +6,17 @@ export const metadata = {
 };
 export const dynamic = 'force-dynamic';
 
-export default async function ContactPage() {
+type Props = { searchParams: Record<string, string | string[] | undefined> };
+
+function str(v: string | string[] | undefined) {
+  return typeof v === 'string' ? v : '';
+}
+
+export default async function ContactPage({ searchParams }: Props) {
   const content = await getManyContent(['contact_title', 'contact_subtext', 'contact_address', 'contact_phone', 'contact_email']);
+
+  const imageUrl = str(searchParams.imageUrl);
+  const caption = str(searchParams.caption);
 
   return (
     <div>
@@ -22,7 +31,7 @@ export default async function ContactPage() {
         <div className="grid gap-12 lg:grid-cols-[1fr_300px]">
           <div>
             <h2 className="mb-6 text-xl font-bold uppercase tracking-[0.1em]">Send a Message</h2>
-            <ContactForm />
+            <ContactForm imageUrl={imageUrl} caption={caption} />
           </div>
 
           <aside className="grid gap-6 self-start">

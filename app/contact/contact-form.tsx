@@ -6,9 +6,20 @@ import { submitContactAction } from '@/lib/actions';
 
 type FormState = { success?: string; error?: string };
 
-export function ContactForm() {
+type Props = {
+  imageUrl?: string;
+  caption?: string;
+};
+
+export function ContactForm({ imageUrl, caption }: Props) {
   const [state, setState] = useState<FormState>({});
   const [pending, setPending] = useState(false);
+
+  const hasImage = !!imageUrl;
+  const defaultSubject = hasImage ? `Inquiry about: ${caption || 'gallery image'}` : '';
+  const defaultMessage = hasImage
+    ? `Hi, I saw this build in the gallery and I'd like to know more about it.\n\nImage: ${imageUrl}${caption ? `\nCaption: ${caption}` : ''}\n\n`
+    : '';
 
   async function onSubmit(formData: FormData) {
     setPending(true);
@@ -30,6 +41,20 @@ export function ContactForm() {
       {state.error && (
         <p className="rounded border border-red-800 bg-red-950/40 px-4 py-3 text-sm text-red-300">{state.error}</p>
       )}
+
+      {/* Gallery image reference */}
+      {hasImage && (
+        <div className="flex gap-4 rounded-lg border border-[#FF1A35]/40 bg-[#FF1A35]/5 p-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imageUrl} alt={caption || 'Gallery image'} className="h-20 w-24 shrink-0 rounded object-cover" />
+          <div className="min-w-0">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[#FF1A35]">Asking about this build</p>
+            {caption && <p className="mt-1 text-sm text-zinc-200">{caption}</p>}
+            <p className="mt-1 truncate text-xs text-zinc-500">{imageUrl}</p>
+          </div>
+        </div>
+      )}
+
       <div className="grid gap-5 md:grid-cols-2">
         <label className="grid gap-1.5">
           <span className="text-xs uppercase tracking-[0.16em] text-zinc-400">Name *</span>
@@ -47,12 +72,12 @@ export function ContactForm() {
         </label>
         <label className="grid gap-1.5">
           <span className="text-xs uppercase tracking-[0.16em] text-zinc-400">Subject</span>
-          <input name="subject" className="input" placeholder="Build inquiry, lead times, etc." />
+          <input name="subject" className="input" placeholder="Build inquiry, lead times, etc." defaultValue={defaultSubject} />
         </label>
       </div>
       <label className="grid gap-1.5">
         <span className="text-xs uppercase tracking-[0.16em] text-zinc-400">Message *</span>
-        <textarea name="message" required rows={6} className="input resize-none" placeholder="Tell us about your project or question..." />
+        <textarea name="message" required rows={6} className="input resize-none" placeholder="Tell us about your project or question..." defaultValue={defaultMessage} />
       </label>
       <button type="submit" disabled={pending} className="btn-primary w-full md:w-auto md:justify-self-start">
         {pending ? 'Sending...' : 'Send Message'}
