@@ -248,7 +248,10 @@ export async function upsertBlogPostAction(formData: FormData): Promise<void> {
   if (id) {
     await prisma.blogPost.update({ where: { id }, data });
   } else {
-    await prisma.blogPost.create({ data });
+    const newPost = await prisma.blogPost.create({ data });
+    if (parsed.imageUrl) {
+      await prisma.blogPostImage.create({ data: { postId: newPost.id, url: parsed.imageUrl, sortOrder: 0 } });
+    }
   }
 
   revalidatePath('/');

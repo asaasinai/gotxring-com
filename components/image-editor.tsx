@@ -12,9 +12,11 @@ interface Props {
   label?: string;
   /** Called immediately after a successful upload with the blob URL */
   onUpload?: (url: string) => void;
+  /** Called when uploading state changes — use to disable form submit */
+  onUploadingChange?: (uploading: boolean) => void;
 }
 
-export function ImageEditor({ urlInputName, currentUrl, label = 'Image', onUpload }: Props) {
+export function ImageEditor({ urlInputName, currentUrl, label = 'Image', onUpload, onUploadingChange }: Props) {
   const [open, setOpen] = useState(false);
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const [rotation, setRotation] = useState(0);
@@ -150,6 +152,7 @@ export function ImageEditor({ urlInputName, currentUrl, label = 'Image', onUploa
     const canvas = canvasRef.current;
     if (!canvas) return;
     setUploading(true);
+    onUploadingChange?.(true);
     setError(null);
 
     const out = document.createElement('canvas');
@@ -166,7 +169,7 @@ export function ImageEditor({ urlInputName, currentUrl, label = 'Image', onUploa
     }
 
     out.toBlob(async (blob) => {
-      if (!blob) { setError('Failed to process image.'); setUploading(false); return; }
+      if (!blob) { setError('Failed to process image.'); setUploading(false); onUploadingChange?.(false); return; }
       const fd = new FormData();
       fd.append('file', new File([blob], 'upload.jpg', { type: 'image/jpeg' }));
       try {
@@ -184,6 +187,7 @@ export function ImageEditor({ urlInputName, currentUrl, label = 'Image', onUploa
         setError(err instanceof Error ? err.message : 'Upload failed');
       } finally {
         setUploading(false);
+        onUploadingChange?.(false);
       }
     }, 'image/jpeg', 0.92);
   }
@@ -204,6 +208,7 @@ export function ImageEditor({ urlInputName, currentUrl, label = 'Image', onUploa
 
     // Auto-upload immediately — no modal
     setUploading(true);
+    onUploadingChange?.(true);
     setError(null);
     const fd = new FormData();
     fd.append('file', file);
@@ -218,6 +223,7 @@ export function ImageEditor({ urlInputName, currentUrl, label = 'Image', onUploa
       setError(err instanceof Error ? err.message : 'Upload failed');
     } finally {
       setUploading(false);
+      onUploadingChange?.(false);
     }
     e.target.value = '';
   }

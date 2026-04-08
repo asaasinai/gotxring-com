@@ -113,6 +113,7 @@ function BlogImageGallery({ postId, images }: { postId: string; images: BlogPost
 export function BlogPostFormClient({ post }: { post?: BlogPost }) {
   const [slug, setSlug] = useState(post?.slug ?? '');
   const [slugEdited, setSlugEdited] = useState(!!post?.slug);
+  const [imageUploading, setImageUploading] = useState(false);
 
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (!slugEdited) setSlug(toSlug(e.target.value));
@@ -173,6 +174,13 @@ export function BlogPostFormClient({ post }: { post?: BlogPost }) {
           </label>
           <textarea className="input min-h-40" name="content" required defaultValue={post?.content} />
         </div>
+        {!post && (
+          <ImageEditor
+            urlInputName="imageUrl"
+            label="Featured Image (optional)"
+            onUploadingChange={setImageUploading}
+          />
+        )}
         <div>
           <label className="label">
             Source URL <span className="font-normal normal-case text-[10px] text-zinc-500">(optional)</span>
@@ -183,13 +191,13 @@ export function BlogPostFormClient({ post }: { post?: BlogPost }) {
           <input type="checkbox" name="published" defaultChecked={post?.published} />
           Published <span className="text-xs text-zinc-500">(visible on site)</span>
         </label>
-        <button className="btn-primary w-fit">{post ? 'Save Changes' : 'Create Post'}</button>
+        <button className="btn-primary w-fit" disabled={imageUploading}>
+          {imageUploading ? 'Uploading image…' : post ? 'Save Changes' : 'Create Post'}
+        </button>
       </form>
 
-      {post ? (
+      {post && (
         <BlogImageGallery postId={post.id} images={post.images ?? []} />
-      ) : (
-        <p className="text-xs text-zinc-600">Save the post first to upload images.</p>
       )}
     </div>
   );
