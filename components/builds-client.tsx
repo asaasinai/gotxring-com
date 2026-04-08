@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 
 import { accessoryInquiryAction } from '@/lib/actions';
@@ -108,7 +109,9 @@ function ModalCarousel({ images }: { images: string[] }) {
 }
 
 export function BuildsClient({ builds }: { builds: BuildCard[] }) {
-  const [activeFilter, setActiveFilter] = useState('All');
+  const searchParams = useSearchParams();
+  const initialFilter = filters.includes(searchParams.get('category') ?? '') ? (searchParams.get('category') as string) : 'All';
+  const [activeFilter, setActiveFilter] = useState(initialFilter);
   const [activeBuild, setActiveBuild] = useState<BuildCard | null>(null);
   const [inquiryOpen, setInquiryOpen] = useState(false);
   const [inquiryName, setInquiryName] = useState('');
