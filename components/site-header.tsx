@@ -41,7 +41,7 @@ export function SiteHeader() {
             <Link
               key={link.href}
               href={link.href}
-              className={`transition hover:text-white ${pathname === link.href ? 'text-white' : ''}`}
+              className={`transition hover:text-[#FF1A35] ${pathname === link.href ? 'text-[#FF1A35]' : ''}`}
             >
               {link.label}
             </Link>
@@ -70,7 +70,7 @@ export function SiteHeader() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`border-b border-zinc-900 py-4 text-sm uppercase tracking-[0.2em] transition hover:text-white ${pathname === link.href ? 'text-white' : 'text-zinc-400'}`}
+                className={`border-b border-zinc-900 py-4 text-sm uppercase tracking-[0.2em] transition hover:text-[#FF1A35] ${pathname === link.href ? 'text-[#FF1A35]' : 'text-zinc-400'}`}
               >
                 {link.label}
               </Link>
