@@ -6,7 +6,10 @@ import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminBlogPostsPage() {
-  const posts = await prisma.blogPost.findMany({ orderBy: { createdAt: 'desc' } });
+  const posts = await prisma.blogPost.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: { images: { orderBy: { sortOrder: 'asc' } } }
+  });
 
   return (
     <div className="grid gap-6">

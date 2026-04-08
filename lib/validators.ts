@@ -28,7 +28,7 @@ export const championSchema = z.object({
 export const blogPostSchema = z.object({
   title: z.string().min(3),
   content: z.string().min(20),
-  excerpt: z.string().min(10),
+  excerpt: z.string().optional().or(z.literal('')),
   slug: z.string().min(3),
   category: z.string().min(2),
   imageUrl: z.string().url().optional().or(z.literal('')),

@@ -136,6 +136,26 @@ export async function deleteBuildImageAction(formData: FormData): Promise<void> 
   revalidatePath('/admin/builds');
 }
 
+export async function addBlogPostImageAction(formData: FormData): Promise<void> {
+  requireAdminSession();
+  const postId = asString(formData.get('postId'));
+  const url = asString(formData.get('imageUrl'));
+  if (!postId || !url) return;
+  const count = await prisma.blogPostImage.count({ where: { postId } });
+  await prisma.blogPostImage.create({ data: { postId, url, sortOrder: count } });
+  revalidatePath('/blog');
+  revalidatePath('/admin/blog-posts');
+}
+
+export async function deleteBlogPostImageAction(formData: FormData): Promise<void> {
+  requireAdminSession();
+  const id = asString(formData.get('id'));
+  if (!id) return;
+  await prisma.blogPostImage.delete({ where: { id } });
+  revalidatePath('/blog');
+  revalidatePath('/admin/blog-posts');
+}
+
 export async function deleteBuildAction(formData: FormData): Promise<void> {
   requireAdminSession();
   const id = asString(formData.get('id'));
@@ -215,7 +235,7 @@ export async function upsertBlogPostAction(formData: FormData): Promise<void> {
   const data = {
     title: parsed.title,
     content: parsed.content,
-    excerpt: parsed.excerpt,
+    excerpt: parsed.excerpt || '',
     slug: parsed.slug,
     category: parsed.category,
     imageUrl: parsed.imageUrl || null,
