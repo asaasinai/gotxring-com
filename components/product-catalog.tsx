@@ -210,16 +210,9 @@ function BuildCard({ build, onClick }: { build: Build; onClick: () => void }) {
 
 export function ProductCatalog({ builds }: { builds: Build[] }) {
   const [active, setActive] = useState<Build | null>(null);
-  const [filter, setFilter] = useState('All');
 
-  // Derive unique disciplines from data, sorted alphabetically
-  const disciplines = ['All', ...Array.from(
-    new Set(builds.map((b) => b.discipline).filter(Boolean))
-  ).sort()];
-
-  // Filter then regroup (accessories are never shown in the systems catalog)
-  const filtered = (filter === 'All' ? builds : builds.filter((b) => b.discipline === filter))
-    .filter((b) => b.category !== 'Accessories');
+  // Accessories are never shown in the systems catalog
+  const filtered = builds.filter((b) => b.category !== 'Accessories');
 
   const categoryMap = new Map<string, Map<string, Build[]>>();
   for (const build of filtered) {
@@ -238,29 +231,8 @@ export function ProductCatalog({ builds }: { builds: Build[] }) {
 
   return (
     <div className="grid gap-10">
-      {/* Discipline filter bar */}
-      {disciplines.length > 1 && (
-        <div className="flex flex-wrap gap-2">
-          {disciplines.map((d) => (
-            <button
-              key={d}
-              type="button"
-              onClick={() => setFilter(d)}
-              className={`rounded-full border px-4 py-1.5 text-xs uppercase tracking-[0.16em] transition ${
-                filter === d
-                  ? 'border-[#FF1A35] bg-[#FF1A35] text-white'
-                  : 'border-zinc-700 text-zinc-400 hover:border-zinc-400 hover:text-white'
-              }`}
-            >
-              {d}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Grouped grid */}
       {grouped.length === 0 ? (
-        <p className="text-sm text-zinc-500">No systems found for this discipline.</p>
+        <p className="text-sm text-zinc-500">No systems available.</p>
       ) : (
         <div className="grid gap-14">
           {grouped.map(({ category, subcategories }) => (

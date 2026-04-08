@@ -1,12 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 
 import { accessoryInquiryAction } from '@/lib/actions';
 
-const filters = ['All', 'F-Class', 'PRS', 'Benchrest', 'Tactical', 'Hunting', 'Sporting', 'Accessories'];
 
 type BuildImage = { id: string; url: string; sortOrder: number };
 
@@ -24,10 +22,6 @@ type BuildCard = {
   images: BuildImage[];
 };
 
-function normalizeDiscipline(discipline: string): string {
-  if (discipline === 'Long Range Hunter') return 'Hunting';
-  return discipline;
-}
 
 function specEntries(specifications: BuildCard['specifications']) {
   if (!specifications || typeof specifications !== 'object' || Array.isArray(specifications)) {
@@ -165,9 +159,6 @@ function ModalCarousel({ images }: { images: string[] }) {
 }
 
 export function BuildsClient({ builds }: { builds: BuildCard[] }) {
-  const searchParams = useSearchParams();
-  const initialFilter = filters.includes(searchParams.get('category') ?? '') ? (searchParams.get('category') as string) : 'All';
-  const [activeFilter, setActiveFilter] = useState(initialFilter);
   const [activeBuild, setActiveBuild] = useState<BuildCard | null>(null);
   const [inquiryOpen, setInquiryOpen] = useState(false);
   const [inquiryName, setInquiryName] = useState('');
@@ -190,11 +181,7 @@ export function BuildsClient({ builds }: { builds: BuildCard[] }) {
     };
   }, [activeBuild]);
 
-  const filtered = useMemo(() => {
-    if (activeFilter === 'All') return builds.filter((b) => b.category !== 'Accessories');
-    if (activeFilter === 'Accessories') return builds.filter((b) => b.category === 'Accessories');
-    return builds.filter((b) => b.category !== 'Accessories' && normalizeDiscipline(b.discipline) === activeFilter);
-  }, [activeFilter, builds]);
+  const filtered = useMemo(() => builds.filter((b) => b.category !== 'Accessories'), [builds]);
 
   function openBuild(build: BuildCard) {
     setActiveBuild(build);
@@ -226,24 +213,6 @@ export function BuildsClient({ builds }: { builds: BuildCard[] }) {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-12 md:px-8">
-      {/* Filter chips */}
-      <div className="mb-6 flex flex-wrap gap-2">
-        {filters.map((filter) => (
-          <button
-            key={filter}
-            type="button"
-            className={
-              activeFilter === filter
-                ? 'rounded-full bg-[#FF1A35] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em]'
-                : 'rounded-full border border-zinc-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-300 hover:border-zinc-500'
-            }
-            onClick={() => setActiveFilter(filter)}
-          >
-            {filter}
-          </button>
-        ))}
-      </div>
-
       {/* Build cards */}
       <div className="grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
         {filtered.map((build) => {
