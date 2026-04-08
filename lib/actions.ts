@@ -425,6 +425,20 @@ export async function updateOrderAction(formData: FormData): Promise<void> {
   revalidatePath('/admin/orders');
 }
 
+export async function setBuildNumberAction(formData: FormData): Promise<{ error?: string }> {
+  requireAdminSession();
+  const id = asString(formData.get('id'));
+  const buildNumber = asString(formData.get('buildNumber')).trim().toUpperCase() || null;
+  if (!id) return { error: 'Missing order ID' };
+  try {
+    await prisma.order.update({ where: { id }, data: { buildNumber } });
+  } catch {
+    return { error: 'Build number already in use' };
+  }
+  revalidatePath('/admin/orders');
+  return {};
+}
+
 export async function deleteOrderAction(formData: FormData): Promise<void> {
   requireAdminSession();
   const id = asString(formData.get('id'));

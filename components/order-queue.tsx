@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { deleteOrderAction, updateOrderAction } from '@/lib/actions';
+import { deleteOrderAction, updateOrderAction, setBuildNumberAction } from '@/lib/actions';
 
 const STATUSES = [
   'Quote Requested',
@@ -45,6 +45,7 @@ type HistoryEntry = { status: string; note: string; at: string };
 
 type Order = {
   id: string;
+  buildNumber: string | null;
   orderType: string;
   selectedSystem: string;
   subcategory: string;
@@ -80,6 +81,51 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 
+function BuildNumberForm({ order }: { order: Order }) {
+  const [value, setValue] = useState(order.buildNumber ?? '');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [saved, setSaved] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+    setSaved(false);
+    const fd = new FormData(e.currentTarget);
+    const result = await setBuildNumberAction(fd);
+    setSaving(false);
+    if (result?.error) {
+      setError(result.error);
+    } else {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex items-end gap-2">
+      <div className="flex-1">
+        <label className="label">Build # <span className="font-normal normal-case text-[10px] text-zinc-500">(unique identifier)</span></label>
+        <input
+          className="input font-mono tracking-wider uppercase"
+          name="buildNumber"
+          placeholder="e.g. CMI-001"
+          value={value}
+          onChange={(e) => setValue(e.target.value.toUpperCase())}
+          disabled={saving}
+        />
+        <input type="hidden" name="id" value={order.id} />
+      </div>
+      <button type="submit" className="btn-primary shrink-0" disabled={saving}>
+        {saving ? 'Saving…' : 'Set'}
+      </button>
+      {saved && <span className="text-xs text-green-400 self-center">✓ Saved</span>}
+      {error && <span className="text-xs text-red-400 self-center">{error}</span>}
+    </form>
+  );
+}
+
 function OrderCard({ order }: { order: Order }) {
   const history = (Array.isArray(order.statusHistory) ? order.statusHistory : []) as HistoryEntry[];
   const isDone = order.status === 'Complete' || order.status === 'Cancelled';
@@ -88,6 +134,9 @@ function OrderCard({ order }: { order: Order }) {
     <div className={`grid gap-5 rounded-xl border p-5 ${isDone ? 'border-zinc-900 bg-black/20 opacity-70' : 'border-zinc-800 bg-black/40'}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
+          {order.buildNumber && (
+            <p className="mb-0.5 font-mono text-xs font-bold tracking-[0.2em] text-[#FF1A35] uppercase">{order.buildNumber}</p>
+          )}
           <p className="text-lg font-bold">{order.customerName}</p>
           <p className="text-sm text-zinc-400">{order.email} · {order.phone}</p>
           <p className="mt-1 text-xs text-zinc-500">Submitted {fmt(order.createdAt.toISOString())}</p>
@@ -141,6 +190,8 @@ function OrderCard({ order }: { order: Order }) {
             </div>
           </div>
 
+          <BuildNumberForm order={order} />
+
           <form
             action={updateOrderAction}
             className="grid gap-3 md:grid-cols-[1fr_2fr_auto] md:items-end"
@@ -188,7 +239,10 @@ function OrderCard({ order }: { order: Order }) {
       )}
 
       {isDone && (
-        <p className="text-xs text-zinc-500">{order.selectedSystem} · {fmt(order.createdAt.toISOString())}</p>
+        <p className="text-xs text-zinc-500">
+          {order.buildNumber && <span className="font-mono font-semibold text-zinc-400 mr-2">{order.buildNumber}</span>}
+          {order.selectedSystem} · {fmt(order.createdAt.toISOString())}
+        </p>
       )}
 
       {isDone && (
@@ -216,6 +270,7 @@ export function OrderQueue({ orders }: { orders: Order[] }) {
     ? orders.filter((o) => {
         const q = query.toLowerCase();
         return (
+          (o.buildNumber ?? '').toLowerCase().includes(q) ||
           o.customerName.toLowerCase().includes(q) ||
           o.selectedSystem.toLowerCase().includes(q) ||
           o.orderType.toLowerCase().includes(q) ||
@@ -243,7 +298,7 @@ export function OrderQueue({ orders }: { orders: Order[] }) {
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">⌕</span>
         <input
           className="input pl-8 w-full"
-          placeholder="Search by name, system, caliber, email, discipline…"
+          placeholder="Search by build #, name, system, caliber, email…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />

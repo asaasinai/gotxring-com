@@ -139,6 +139,7 @@ model Order {
   notes               String?
   configSelections    Json     @default("{}")
   // Status / queue
+  buildNumber         String?  @unique
   status              String   @default("Quote Requested")
   statusHistory       Json     @default("[]")
   estimatedCompletion DateTime?
