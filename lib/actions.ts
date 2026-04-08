@@ -74,6 +74,7 @@ export async function upsertBuildAction(formData: FormData): Promise<void> {
     caliber: asString(formData.get('caliber')),
     imageUrl,
     specificationsText: asString(formData.get('specificationsText')),
+    price: asString(formData.get('price')),
     featured: asBoolean(formData.get('featured')),
     sortOrder: parseInt(asString(formData.get('sortOrder')) || '0', 10)
   });
@@ -94,6 +95,7 @@ export async function upsertBuildAction(formData: FormData): Promise<void> {
     chassisType: parsed.chassisType || '',
     caliber: parsed.caliber,
     imageUrl: parsed.imageUrl || null,
+    price: parsed.price || null,
     specifications,
     featured: parsed.featured ?? false,
     sortOrder: parsed.sortOrder ?? 0

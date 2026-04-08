@@ -17,6 +17,7 @@ model Build {
   chassisType    String       @default("")
   caliber        String
   imageUrl       String?
+  price          String?
   specifications Json
   featured       Boolean      @default(false)
   sortOrder      Int          @default(0)

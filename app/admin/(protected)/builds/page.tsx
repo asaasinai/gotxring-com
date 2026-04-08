@@ -35,7 +35,7 @@ function BuildForm({ build }: { build?: BuildWithImages }) {
           <input className="input" name="caliber" required defaultValue={build?.caliber} placeholder="e.g. 6.5 Creedmoor" />
         </div>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-3">
         <div>
           <label className="label">Chassis / Stock</label>
           <input className="input" name="chassisType" defaultValue={build?.chassisType ?? ''} placeholder="optional" />
@@ -43,6 +43,12 @@ function BuildForm({ build }: { build?: BuildWithImages }) {
         <div>
           <label className="label">Discipline / Tag</label>
           <input className="input" name="discipline" defaultValue={build?.discipline ?? ''} placeholder="e.g. F-Class, PRS" />
+        </div>
+        <div>
+          <label className="label">
+            Price <span className="font-normal normal-case text-[10px] text-zinc-500">(leave blank to hide)</span>
+          </label>
+          <input className="input" name="price" defaultValue={build?.price ?? ''} placeholder="e.g. $4,200" />
         </div>
       </div>
       <div>

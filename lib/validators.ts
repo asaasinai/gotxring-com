@@ -9,6 +9,7 @@ export const buildSchema = z.object({
   chassisType: z.string().optional().or(z.literal('')),
   caliber: z.string().min(1),
   imageUrl: z.string().url().optional().or(z.literal('')),
+  price: z.string().optional().or(z.literal('')),
   specificationsText: z.string().min(2),
   featured: z.boolean().optional(),
   sortOrder: z.number().optional()

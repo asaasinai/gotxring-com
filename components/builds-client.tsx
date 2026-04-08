@@ -19,6 +19,7 @@ type BuildCard = {
   caliber: string;
   chassisType: string;
   imageUrl: string | null;
+  price: string | null;
   specifications: Record<string, unknown> | unknown;
   images: BuildImage[];
 };
@@ -222,6 +223,9 @@ export function BuildsClient({ builds }: { builds: BuildCard[] }) {
                 )}
                 <p className="mt-2 text-xs text-zinc-300 sm:text-sm">{build.caliber}</p>
                 <h3 className="mt-1 text-base font-bold sm:text-xl">{build.name}</h3>
+                {build.price && (
+                  <p className="mt-1.5 inline-block rounded border border-zinc-700 bg-zinc-900 px-2 py-0.5 text-xs font-semibold text-white">{build.price}</p>
+                )}
                 <p className="mt-1 text-[10px] uppercase tracking-widest text-[#FF1A35] sm:mt-2">View Details →</p>
               </div>
             </button>
@@ -261,6 +265,9 @@ export function BuildsClient({ builds }: { builds: BuildCard[] }) {
                     )}
                     <h3 className="mt-2 text-xl font-bold sm:text-2xl">{activeBuild.name}</h3>
                     <p className="mt-1 text-sm text-zinc-300">{activeBuild.caliber}</p>
+                    {activeBuild.price && (
+                      <p className="mt-2 inline-block rounded border border-zinc-600 bg-zinc-900 px-3 py-1 text-sm font-semibold text-white">{activeBuild.price}</p>
+                    )}
                   </div>
                   <button type="button" className="btn-muted shrink-0 text-xs" onClick={() => setActiveBuild(null)}>
                     ✕ Close
