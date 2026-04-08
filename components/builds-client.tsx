@@ -42,6 +42,61 @@ function getBuildImages(build: BuildCard): string[] {
   return build.imageUrl ? [build.imageUrl] : [];
 }
 
+// ─── Card image carousel ─────────────────────────────────────────────────────
+
+function CardCarousel({ images, onOpen }: { images: string[]; onOpen: () => void }) {
+  const [idx, setIdx] = useState(0);
+
+  const prev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIdx((i) => (i - 1 + images.length) % images.length);
+  };
+  const next = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIdx((i) => (i + 1) % images.length);
+  };
+
+  const thumb = images[idx] ?? '';
+
+  return (
+    <div
+      className="relative aspect-video cursor-pointer bg-zinc-900"
+      style={thumb ? {
+        backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.05)), url(${thumb})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      } : undefined}
+      onClick={onOpen}
+    >
+      {images.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={prev}
+            className="absolute left-1.5 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/90 transition"
+          >
+            <svg viewBox="0 0 8 14" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M7 1L1 7l6 6" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={next}
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/90 transition"
+          >
+            <svg viewBox="0 0 8 14" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1 1l6 6-6 6" />
+            </svg>
+          </button>
+          <span className="absolute bottom-2 right-2 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-zinc-300">
+            {idx + 1} / {images.length}
+          </span>
+        </>
+      )}
+    </div>
+  );
+}
+
 // ─── Inline image carousel for the modal ────────────────────────────────────
 
 function ModalCarousel({ images }: { images: string[] }) {
@@ -193,29 +248,17 @@ export function BuildsClient({ builds }: { builds: BuildCard[] }) {
       <div className="grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
         {filtered.map((build) => {
           const images = getBuildImages(build);
-          const thumb = images[0] ?? '';
           return (
-            <button
+            <div
               key={build.id}
-              type="button"
-              className="section-shell overflow-hidden rounded-lg text-left transition hover:border-zinc-600 active:scale-[0.99]"
-              onClick={() => openBuild(build)}
+              className="section-shell overflow-hidden rounded-lg text-left transition hover:border-zinc-600"
             >
-              <div
-                className="relative aspect-video bg-zinc-900"
-                style={thumb ? {
-                  backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.65), rgba(0,0,0,0.1)), url(${thumb})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                } : undefined}
+              <CardCarousel images={images} onOpen={() => openBuild(build)} />
+              <button
+                type="button"
+                className="w-full p-4 text-left sm:p-5"
+                onClick={() => openBuild(build)}
               >
-                {images.length > 1 && (
-                  <span className="absolute right-2 top-2 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-zinc-300">
-                    {images.length} photos
-                  </span>
-                )}
-              </div>
-              <div className="p-4 sm:p-5">
                 {build.discipline && (
                   <p className="inline-block rounded bg-[#FF1A35] px-2 py-0.5 text-[10px] uppercase tracking-[0.16em]">
                     {build.discipline}
@@ -227,8 +270,8 @@ export function BuildsClient({ builds }: { builds: BuildCard[] }) {
                   <p className="mt-1.5 inline-block rounded border border-zinc-700 bg-zinc-900 px-2 py-0.5 text-xs font-semibold text-white">{build.price}</p>
                 )}
                 <p className="mt-1 text-[10px] uppercase tracking-widest text-[#FF1A35] sm:mt-2">View Details →</p>
-              </div>
-            </button>
+              </button>
+            </div>
           );
         })}
       </div>
