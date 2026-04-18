@@ -29,7 +29,8 @@ const FINISH_OPTIONS = [
   { value: 'Other', label: 'Other / TBD' },
 ];
 
-const STEPS = ['Type', 'System', 'Build', 'Add-Ons', 'Info', 'Review'];
+const BASE_STEPS_BEFORE = ['Type', 'System', 'Build'];
+const BASE_STEPS_AFTER = ['Info', 'Review'];
 
 export type ConfigGroupForForm = {
   id: string;
@@ -50,18 +51,18 @@ type Props = {
   configGroups?: ConfigGroupForForm[];
 };
 
-function StepIndicator({ current }: { current: number }) {
+function StepIndicator({ current, steps }: { current: number; steps: string[] }) {
   return (
     <div className="mb-6">
       {/* Mobile: current step name */}
       <div className="mb-3 flex items-center justify-between sm:hidden">
-        <span className="text-xs uppercase tracking-wider text-zinc-500">Step {current + 1} of {STEPS.length}</span>
-        <span className="text-sm font-semibold text-white">{STEPS[current]}</span>
+        <span className="text-xs uppercase tracking-wider text-zinc-500">Step {current + 1} of {steps.length}</span>
+        <span className="text-sm font-semibold text-white">{steps[current]}</span>
       </div>
       {/* Bubbles */}
       <div className="flex items-center overflow-x-auto pb-1">
-        {STEPS.map((label, i) => (
-          <div key={label} className="flex items-center shrink-0">
+        {steps.map((label, i) => (
+          <div key={`${label}-${i}`} className="flex items-center shrink-0">
             <div className="flex flex-col items-center gap-1">
               <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-all ${
                 i < current ? 'bg-[#FF1A35] text-white' :
@@ -74,7 +75,7 @@ function StepIndicator({ current }: { current: number }) {
                 {label}
               </span>
             </div>
-            {i < STEPS.length - 1 && (
+            {i < steps.length - 1 && (
               <div className={`mx-2 h-px w-8 sm:w-10 ${i < current ? 'bg-[#FF1A35]' : 'bg-zinc-800'}`} />
             )}
           </div>
@@ -110,9 +111,7 @@ function FieldError({ msg }: { msg?: string }) {
   return <p className="mt-1 text-xs text-red-400">{msg}</p>;
 }
 
-const ADDONS_STEP = 3;
-const INFO_STEP = 4;
-const REVIEW_STEP = 5;
+const ADDONS_START = 3; // first add-on step index (one step per ConfigOptionGroup)
 
 export function OrderForm({
   initialOrderType = '',
@@ -125,6 +124,13 @@ export function OrderForm({
   orderPhone = '928-649-0742',
   configGroups = [],
 }: Props) {
+  const addonStepLabels = configGroups.map((_, i) => `Add-On ${i + 1}`);
+  const STEPS = [...BASE_STEPS_BEFORE, ...addonStepLabels, ...BASE_STEPS_AFTER];
+  const INFO_STEP = ADDONS_START + configGroups.length;
+  const REVIEW_STEP = INFO_STEP + 1;
+  const isAddonStep = (s: number) => s >= ADDONS_START && s < ADDONS_START + configGroups.length;
+  const addonGroupAt = (s: number) => configGroups[s - ADDONS_START];
+
   const [step, setStep] = useState(Math.min(initialStep, REVIEW_STEP));
   const [state, setState] = useState<FormState>({});
   const [pending, setPending] = useState(false);
@@ -275,7 +281,7 @@ export function OrderForm({
         </a>
       </div>
 
-      <StepIndicator current={step} />
+      <StepIndicator current={step} steps={STEPS} />
 
       {/* Lead time note — visible on all steps before review */}
       {step < REVIEW_STEP && (
@@ -393,65 +399,68 @@ export function OrderForm({
           </div>
         )}
 
-        {/* Step 3 — Add-Ons */}
-        {step === ADDONS_STEP && (
-          <div className="grid gap-6">
-            <div>
-              <h2 className="text-lg font-bold uppercase tracking-wide">Add-On Options</h2>
-              <p className="mt-1 text-xs uppercase tracking-wider text-zinc-500">Optional — select any variations you want included</p>
+        {/* Add-On steps — one per ConfigOptionGroup */}
+        {isAddonStep(step) && (() => {
+          const group = addonGroupAt(step);
+          if (!group) return null;
+          const selected = configSelections[group.id] ?? [];
+          const stepNum = step - ADDONS_START + 1;
+          const totalAddons = configGroups.length;
+          return (
+            <div className="grid gap-5">
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-zinc-500">
+                  Add-On {stepNum} of {totalAddons} · Optional
+                </p>
+                <h2 className="mt-1 text-lg font-bold uppercase tracking-wide">{group.name}</h2>
+                {group.description && (
+                  <p className="mt-1 text-sm text-zinc-400">{group.description}</p>
+                )}
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {group.items.map((item) => {
+                  const isOn = selected.includes(item.id);
+                  return (
+                    <button
+                      type="button"
+                      key={item.id}
+                      onClick={() => toggleConfigItem(group.id, item.id)}
+                      className={`group relative flex flex-col overflow-hidden rounded-xl border text-left transition ${
+                        isOn ? 'border-[#FF1A35] bg-[#FF1A35]/10' : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-600'
+                      }`}
+                    >
+                      {item.imageUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={item.imageUrl} alt={item.label}
+                          className="h-56 w-full object-cover sm:h-64" />
+                      ) : (
+                        <div className="flex h-56 w-full items-center justify-center bg-zinc-800 text-xs uppercase tracking-wider text-zinc-600 sm:h-64">
+                          No image
+                        </div>
+                      )}
+                      <div className={`absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-md border backdrop-blur ${
+                        isOn ? 'border-[#FF1A35] bg-[#FF1A35] text-white' : 'border-zinc-500 bg-black/60 text-transparent'
+                      }`}>
+                        <span className="text-sm leading-none">✓</span>
+                      </div>
+                      <div className="p-4">
+                        <p className={`text-base font-semibold ${isOn ? 'text-white' : 'text-zinc-200'}`}>{item.label}</p>
+                        {item.description && (
+                          <p className="mt-1 text-sm text-zinc-400">{item.description}</p>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              {selected.length > 0 && (
+                <p className="text-xs text-zinc-500">
+                  {selected.length} selected
+                </p>
+              )}
             </div>
-            {configGroups.length === 0 && (
-              <p className="text-sm text-zinc-500">No add-on options configured yet.</p>
-            )}
-            {configGroups.map((group) => {
-              const selected = configSelections[group.id] ?? [];
-              return (
-                <div key={group.id} className="grid gap-3">
-                  <div>
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-white">{group.name}</h3>
-                    {group.description && (
-                      <p className="mt-0.5 text-xs text-zinc-500">{group.description}</p>
-                    )}
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {group.items.map((item) => {
-                      const isOn = selected.includes(item.id);
-                      return (
-                        <button
-                          type="button"
-                          key={item.id}
-                          onClick={() => toggleConfigItem(group.id, item.id)}
-                          className={`flex items-start gap-3 rounded-xl border p-3 text-left transition ${
-                            isOn ? 'border-[#FF1A35] bg-[#FF1A35]/10' : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-600'
-                          }`}
-                        >
-                          <div className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded border ${
-                            isOn ? 'border-[#FF1A35] bg-[#FF1A35] text-white' : 'border-zinc-600 bg-zinc-950'
-                          }`}>
-                            {isOn && <span className="text-xs leading-none">✓</span>}
-                          </div>
-                          {item.imageUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={item.imageUrl} alt={item.label}
-                              className="h-16 w-16 shrink-0 rounded object-cover" />
-                          ) : (
-                            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded bg-zinc-800 text-[10px] uppercase tracking-wider text-zinc-600">No image</div>
-                          )}
-                          <div className="min-w-0 flex-1">
-                            <p className={`text-sm font-semibold ${isOn ? 'text-white' : 'text-zinc-200'}`}>{item.label}</p>
-                            {item.description && (
-                              <p className="mt-0.5 text-xs text-zinc-400 line-clamp-2">{item.description}</p>
-                            )}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+          );
+        })()}
 
         {/* Step 4 — Info */}
         {step === INFO_STEP && (
@@ -544,7 +553,7 @@ export function OrderForm({
                   <div className="py-3">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-[10px] uppercase tracking-wider text-zinc-500">Add-Ons</span>
-                      <button type="button" onClick={() => setStep(ADDONS_STEP)} className="text-[10px] uppercase tracking-wider text-zinc-500 hover:text-[#FF1A35] transition">Edit</button>
+                      <button type="button" onClick={() => setStep(ADDONS_START)} className="text-[10px] uppercase tracking-wider text-zinc-500 hover:text-[#FF1A35] transition">Edit</button>
                     </div>
                     <div className="grid gap-1">
                       {entries.map(([group, labels]) => (
@@ -591,7 +600,7 @@ export function OrderForm({
             onClick={handleAdvance}
             className={`btn-primary text-sm ${!canAdvance() ? 'cursor-not-allowed opacity-40' : ''}`}
           >
-            {step === ADDONS_STEP ? 'Your Info →' : step === INFO_STEP ? 'Review Order →' : 'Continue →'}
+            {step === INFO_STEP - 1 ? 'Your Info →' : step === INFO_STEP ? 'Review Order →' : 'Continue →'}
           </button>
         )}
       </div>
