@@ -20,9 +20,29 @@ type OrderEmailPayload = {
   discipline?: string | null;
   caliber?: string | null;
   notes?: string | null;
+  configSelections?: unknown;
   status: string;
   createdAt: Date;
 };
+
+function configSelectionsHtml(sel: unknown): string {
+  if (!sel || typeof sel !== 'object' || Array.isArray(sel)) return '';
+  const entries = Object.entries(sel as Record<string, unknown>)
+    .map(([group, value]) => {
+      const labels = Array.isArray(value)
+        ? (value as unknown[]).filter((v): v is string => typeof v === 'string')
+        : typeof value === 'string' && value ? [value] : [];
+      return [group, labels] as const;
+    })
+    .filter(([, labels]) => labels.length > 0);
+  if (!entries.length) return '';
+  return entries
+    .map(
+      ([group, labels]) =>
+        `<tr><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#d1d5db;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;">${group}</td><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#fff;">${labels.join(', ')}</td></tr>`
+    )
+    .join('');
+}
 
 function orderSummaryRows(order: OrderEmailPayload): string {
   const rows = [
@@ -47,7 +67,7 @@ function orderSummaryRows(order: OrderEmailPayload): string {
       ([label, value]) =>
         `<tr><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#d1d5db;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;">${label}</td><td style="padding:8px 12px;border-bottom:1px solid #2a2a2a;color:#fff;">${value}</td></tr>`
     )
-    .join('');
+    .join('') + configSelectionsHtml(order.configSelections);
 }
 
 function wrapTemplate(title: string, bodyHtml: string): string {

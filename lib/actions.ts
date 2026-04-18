@@ -468,10 +468,20 @@ export async function upsertOrderAction(formData: FormData): Promise<{ success?:
     return { error: parsed.error.issues[0]?.message || 'Invalid form submission.' };
   }
 
-  let configSelections: Record<string, string> = {};
+  let configSelections: Record<string, string[]> = {};
   try {
     const raw = asString(formData.get('configSelections'));
-    if (raw) configSelections = JSON.parse(raw) as Record<string, string>;
+    if (raw) {
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      for (const [key, value] of Object.entries(parsed)) {
+        if (Array.isArray(value)) {
+          const labels = value.filter((v): v is string => typeof v === 'string' && !!v.trim());
+          if (labels.length) configSelections[key] = labels;
+        } else if (typeof value === 'string' && value.trim()) {
+          configSelections[key] = [value];
+        }
+      }
+    }
   } catch { /* ignore */ }
 
   const order = await prisma.order.create({

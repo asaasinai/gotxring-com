@@ -159,14 +159,24 @@ function OrderCard({ order }: { order: Order }) {
             {(() => {
               const sel = order.configSelections;
               if (!sel || typeof sel !== 'object' || Array.isArray(sel)) return null;
-              const entries = Object.values(sel as Record<string, string>);
+              const entries = Object.entries(sel as Record<string, unknown>)
+                .map(([group, value]) => {
+                  const labels = Array.isArray(value)
+                    ? (value as unknown[]).filter((v): v is string => typeof v === 'string')
+                    : typeof value === 'string' && value ? [value] : [];
+                  return [group, labels] as const;
+                })
+                .filter(([, labels]) => labels.length > 0);
               if (!entries.length) return null;
               return (
                 <div className="mt-2 border-t border-zinc-800 pt-2">
-                  <p className="text-[11px] uppercase tracking-wider text-zinc-500 mb-1">Configuration Selections</p>
-                  <div className="grid gap-0.5">
-                    {entries.map((label) => (
-                      <p key={label} className="text-zinc-300 text-xs">· {label}</p>
+                  <p className="text-[11px] uppercase tracking-wider text-zinc-500 mb-1">Add-On Selections</p>
+                  <div className="grid gap-1">
+                    {entries.map(([group, labels]) => (
+                      <div key={group} className="text-xs">
+                        <span className="font-semibold text-zinc-200">{group}:</span>
+                        <span className="ml-1 text-zinc-400">{labels.join(', ')}</span>
+                      </div>
                     ))}
                   </div>
                 </div>

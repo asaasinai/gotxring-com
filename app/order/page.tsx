@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 
 import { OrderForm } from '@/components/order-form';
 import { getManyContent } from '@/lib/content';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,6 +20,24 @@ function str(v: string | string[] | undefined): string {
 
 export default async function OrderPage({ searchParams }: Props) {
   const content = await getManyContent(['lead_time', 'order_phone']);
+  const configGroups = await prisma.configOptionGroup.findMany({
+    where: { active: true },
+    orderBy: { sortOrder: 'asc' },
+    include: { items: { orderBy: { sortOrder: 'asc' } } },
+  });
+  const groupsForForm = configGroups
+    .filter((g) => g.items.length > 0)
+    .map((g) => ({
+      id: g.id,
+      name: g.name,
+      description: g.description,
+      items: g.items.map((i) => ({
+        id: i.id,
+        label: i.label,
+        description: i.description,
+        imageUrl: i.imageUrl,
+      })),
+    }));
   const rawCategory = str(searchParams.category);
   const orderType: 'Chassis System' | 'Full Rifle System' | '' =
     rawCategory.startsWith('Full') ? 'Full Rifle System' :
@@ -54,6 +73,7 @@ export default async function OrderPage({ searchParams }: Props) {
             initialStep={initialStep}
             leadTime={content.lead_time}
             orderPhone={content.order_phone}
+            configGroups={groupsForForm}
           />
         </Suspense>
       </div>
